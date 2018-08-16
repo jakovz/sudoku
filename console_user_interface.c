@@ -1,72 +1,118 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mem.h>
-#include "game_logic.h"
 #include "console_user_interface.h"
+#include "game_logic.h"
 
 
-char **get_and_parse_command(){
-    // takes care only of parsing the command from user input.
-    // i.e validating it's length, ignoring whitespaces, \n's etc.
+const char *all_commands[] = {"solve", "edit", "print_board", "set", "validate", "generate", "undo", "redo",
+                                    "save", "num_solutions", "autofill", "hint", "mark_errors", "reset", "exit", NULL};
+
+const char *edit_commands[] = {"solve", "edit", "print_board", "set", "validate", "generate", "undo", "redo",
+                                     "save", "num_solutions", "reset", "exit", NULL};
+const char *solve_commands[] = {"solve", "edit", "mark_errors", "print_board", "set", "validate", "undo", "redo",
+                                      "save", "hint", "num_solutions", "autofill", "reset", "exit", NULL};
+const char *init_commands[] = {"solve", "edit", NULL};
+
+int execute_command(char *command, char *parameters) {
+    /* TODO: write documentation */
+    if (strcmp(all_commands[0], command) == 0) {
+        execute_solve(parameters);
+    } else if (strcmp(all_commands[1], command) == 0) {
+        execute_edit(parameters);
+    } else if (strcmp(all_commands[2], command) == 0) {
+        //print_board(); // should pass our board as argument here
+    } else if ((strcmp(all_commands[3], command) == 0)) {
+        execute_set_cell(parameters);
+    } else if ((strcmp(all_commands[4], command) == 0)) {
+        validate_solution();
+    } else if ((strcmp(all_commands[5], command) == 0)) {
+        execute_generate(parameters);
+    } else if ((strcmp(all_commands[6], command) == 0)) {
+        undo();
+    } else if ((strcmp(all_commands[7], command) == 0)) {
+        redo();
+    } else if ((strcmp(all_commands[8], command) == 0)) {
+        execute_save_board(parameters);
+    } else if ((strcmp(all_commands[9], command) == 0)) {
+        num_solutions();
+    } else if ((strcmp(all_commands[10], command) == 0)) {
+        autofill();
+    } else if ((strcmp(all_commands[11], command) == 0)) {
+        execute_get_hint(parameters);
+    } else if ((strcmp(all_commands[12], command) == 0)) {
+        execute_mark_errors(parameters);
+    }
+    else if (strcmp(all_commands[13], command) == 0) {
+        restart_game();
+    } else if ((strcmp(all_commands[14], command) == 0)) {
+        return 0;
+    } else {
+        // TODO: check what else might cause an invalid command
+        printf("Error: invalid command\n");
+    }
+    fflush(stdin); // TODO: remove this
+    return 1;
 }
 
-void init(){
-    // responsible for handling the init phase
+
+int check_if_suitable_command(const char *commands[], char *command) {
+    int i;
+    i = 0;
+    // TODO: should fix this strlen
+    while (commands[i]!=NULL) {
+        if (strcmp(command, commands[i]) == 0) {
+            return 1;
+        }
+        i++;
+    }
+    return 0;
 }
 
-void edit(){
-    // responsible for handling the edit phase
-}
-
-void solve(){
-    // responsible for handling the solve phase
-}
-
-void play_game(){
+void play_game() {
     char *command_and_parameters;
     char *command;
     char *parameters;
-    char *exit_string;
-    char *set;
-    char *hint;
-    char *validate;
-    char *restart;
     int command_max_length;
     command_max_length = COMMAND_AND_PARAMS_SIZE;
-    exit_string = "exit";
-    set = "set";
-    hint = "hint";
-    validate = "validate";
-    restart = "restart";
     command_and_parameters = (char *) malloc(sizeof(char) * command_max_length);
     if (!command_and_parameters) {
         printf("Error: play_game() has failed\n");
         exit(-1);
     }
-    fflush(stdin);
+    fflush(stdin); // TODO: remove it after testing
     while (fgets(command_and_parameters, command_max_length, stdin) != NULL) {
-        command = strtok(command_and_parameters, " \t\r\n");
-        parameters = strtok(NULL, "\t\r\n");
-        fflush(stdin);
-        if (command==NULL){
-            fflush(stdin);
+        if (command == NULL) {
+            fflush(stdin); // TODO: also should be deleted
             continue;
         }
-        else if (strcmp(set, command) == 0 && IS_GAME_BOARD_SOLVED == 0) {
-            set_cell(parameters);
-        } else if (strcmp(hint, command) == 0 && IS_GAME_BOARD_SOLVED == 0) {
-            get_hint(parameters);
-        } else if (strcmp(validate, command) == 0 && IS_GAME_BOARD_SOLVED == 0) {
-            validate_solution();
-        } else if (strcmp(restart, command) == 0) {
-            restart_game();
-        } else if ((strcmp(exit_string, command) == 0)){
-            break;
-        } else {
-            printf("Error: invalid command\n");
+        command = strtok(command_and_parameters, " \t\r\n");
+        parameters = strtok(NULL, "\t\r\n");
+        // checking if the command is allowed in the current mode
+        if (GAME_MODE == 0) {
+            if (!check_if_suitable_command(init_commands, command)) {
+                printf("ERROR: invalid command\n");
+                continue;
+            }
+        } else if (GAME_MODE == 1) {
+            if (!check_if_suitable_command(edit_commands, command)) {
+                printf("ERROR: invalid command\n");
+                continue;
+            }
+        } else if (GAME_MODE == 2) {
+            if (!check_if_suitable_command(solve_commands, command)) {
+                printf("ERROR: invalid command\n");
+                continue;
+            }
         }
-        fflush(stdin);
+        if (!execute_command(command, parameters)){
+            // means that an exit command was given
+            break;
+        }
+        fflush(stdin); // TODO: should be deleted after testing
+
     }
+    // TODO: check if we should free more stuff here
     free(command_and_parameters);
     printf("Exiting...\n");
 }

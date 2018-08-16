@@ -11,7 +11,7 @@ void mark_errors(int X){
 
 }
 
-void set(int x, int y, int z){
+void set_cell(int x, int y, int z){
 
 }
 
@@ -23,7 +23,7 @@ void redo(){
 
 }
 
-void save(char *path[]){
+void save_board(char *path[]){
 
 }
 
@@ -31,7 +31,7 @@ void hint(int x, int y){
 
 }
 
-void validate(){
+void validate_board(){
     // a call to ilp solver here
 }
 
@@ -51,6 +51,6 @@ void reset(){
 
 }
 
-void exit(){
+void exit_game(){
 
 }

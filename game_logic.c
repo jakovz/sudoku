@@ -6,17 +6,20 @@
 #include "helper_functions.h"
 
 
-void execute_solve(char **params){
-    // parse args
-    // call solve();
-    solve(params[0]);
-}
-void execute_edit(char *params){
-}
-void execute_set_cell(char *params){
-    printf("hello set_cell\n");
+void execute_set_cell(char **params){
+    int set_cell_params[3];
+    int i;
+    char *next;
+    for (i=0;i<3;i++){
+        set_cell_params[i] = strtol(params[i], &next, 10);
+        if (next<=params[i]){
+            printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
+        }
+    }
+    set_cell(set_cell_params[0],set_cell_params[1],set_cell_params[2]);
 }
 void execute_generate(char *params){
+
     printf("hello generate\n");
 }
 void execute_save_board(char *params){
@@ -66,7 +69,7 @@ void validate_solution(){
     // a call to ilp solver here
 }
 
-void generate(int parameters, int i){
+void generate(int x, int y){
 
 }
 
@@ -93,6 +96,7 @@ void init_game(){
     GAME_MODE = 1;
     ROWS_PER_BLOCK = 3;
     COLUMNS_PER_BLOCK = 3;
+    ROWS_COLUMNS_NUM = ROWS_PER_BLOCK*COLUMNS_PER_BLOCK;
     game_board = malloc(sizeof(int)*9);
     erroneous_board = malloc(sizeof(int)*9);
     fixed_numbers_board = malloc(sizeof(int)*9);

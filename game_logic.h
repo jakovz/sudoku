@@ -8,6 +8,7 @@ int **fixed_numbers_board;
 int **erroneous_board;
 int ROWS_PER_BLOCK;
 int COLUMNS_PER_BLOCK;
+int ROWS_COLUMNS_NUM;
 int GAME_MODE; // 0 - init mode, 1 - edit mode, 2 - solve mode
 int MARK_ERRORS; // 0 - do not mark errors, 1 - mark errors
 

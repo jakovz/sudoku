@@ -3,6 +3,7 @@
 #include <mem.h>
 #include "console_user_interface.h"
 #include "game_logic.h"
+#include "helper_functions.h"
 
 
 const char *all_commands[] = {"solve", "edit", "print_board", "set", "validate", "generate", "undo", "redo",
@@ -16,24 +17,25 @@ const char *init_commands[] = {"solve", "edit", NULL};
 
 int execute_command(char *command, char *parameters) {
     /* TODO: write documentation */
+    char **params = str_split(parameters, ' ');
     if (strcmp(all_commands[0], command) == 0) {
-        execute_solve(parameters);
+        solve(params[0]);
     } else if (strcmp(all_commands[1], command) == 0) {
-        execute_edit(parameters);
+        edit(params[0]);
     } else if (strcmp(all_commands[2], command) == 0) {
         //print_board(); // should pass our board as argument here
     } else if ((strcmp(all_commands[3], command) == 0)) {
-        execute_set_cell(parameters);
+        execute_set_cell(params);
     } else if ((strcmp(all_commands[4], command) == 0)) {
         validate_solution();
     } else if ((strcmp(all_commands[5], command) == 0)) {
-        execute_generate(parameters);
+        execute_generate(params);
     } else if ((strcmp(all_commands[6], command) == 0)) {
         undo();
     } else if ((strcmp(all_commands[7], command) == 0)) {
         redo();
     } else if ((strcmp(all_commands[8], command) == 0)) {
-        execute_save_board(parameters);
+        execute_save_board(params);
     } else if ((strcmp(all_commands[9], command) == 0)) {
         num_solutions();
     } else if ((strcmp(all_commands[10], command) == 0)) {

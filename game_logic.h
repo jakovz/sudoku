@@ -2,6 +2,14 @@
 #define sudoku_GAME_LOGIC_H
 #endif //sudoku_GAME_LOGIC_H
 
+struct game_move{
+    struct game_move *next;
+    struct game_move *prev;
+    int x_value;
+    int y_value;
+    int new_z_value;
+    int old_z_value;
+} *game_moves;
 
 int **game_board;
 int **fixed_numbers_board;

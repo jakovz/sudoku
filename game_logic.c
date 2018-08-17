@@ -62,13 +62,11 @@ void execute_mark_errors(char **params){
 }
 
 void solve(char *path){
-    // should load the board from file
+    // loads the board from file
     FILE *fp;
     int i;
     int j;
     int c;
-    int ROWS_PER_BLOCK;
-    int COLUMNS_PER_BLOCK;
     GAME_MODE = 2;
     fp = fopen(path,"r");
     if (fp == NULL){
@@ -77,24 +75,21 @@ void solve(char *path){
     }
     else{
         fscanf(fp, " "); /*skip whitespaces*/
-        ROWS_PER_BLOCK = fgetc(fp);
+        fscanf(fp, "%d", &ROWS_PER_BLOCK);
         fscanf(fp, " "); /*skip whitespaces*/
-        //fgetc(fp); /*space*/
-        COLUMNS_PER_BLOCK = fgetc(fp);
+        fscanf(fp, "%d", &COLUMNS_PER_BLOCK);
+        init_game();
         fscanf(fp, " "); /*skip whitespaces*/
-        //fgetc(fp); /*\n*/
-        for (i = 0; i< ROWS_PER_BLOCK*COLUMNS_PER_BLOCK; i++){
-            for (j = 0; j< ROWS_PER_BLOCK*COLUMNS_PER_BLOCK; j++){
-                game_board[i][j] = fgetc(fp);
+        for (i = 0; i< ROWS_COLUMNS_NUM; i++){
+            for (j = 0; j< ROWS_COLUMNS_NUM; j++){
+                 fscanf(fp, "%d", &(game_board[i][j]));
                 if (feof(fp)){
                     break;
                 } else if ((c = fgetc(fp)) == '.'){
                     fixed_numbers_board[i][j] = 1;
                     fscanf(fp, " "); /*skip whitespaces*/
-                    //fgetc(fp); /*space or \n*/
                 } else{
                     fscanf(fp, " "); /*skip whitespaces*/
-                    //fgetc(fp); /*space or \n*/
                 }
             }
         }
@@ -157,24 +152,14 @@ void exit_game(){
 void init_game(){
     int i;
     int j;
-    printf("Sudoku\n------\n");
-    GAME_MODE = 1;
-    ROWS_PER_BLOCK = 3;
-    COLUMNS_PER_BLOCK = 3;
     ROWS_COLUMNS_NUM = ROWS_PER_BLOCK*COLUMNS_PER_BLOCK;
     EMPTY_CELLS_NUM = ROWS_COLUMNS_NUM*ROWS_COLUMNS_NUM;
-    game_board = malloc(sizeof(int)*9);
-    erroneous_board = malloc(sizeof(int)*9);
-    fixed_numbers_board = malloc(sizeof(int)*9);
-    for (i=0; i<9;i++){
-        game_board[i] = malloc(sizeof(int)*9);
-        fixed_numbers_board[i] = malloc(sizeof(int)*9);
-        erroneous_board[i] = malloc(sizeof(int)*9);
-    }
-    for(i=0;i<9; i++){
-        for(j=0; j<9; j++) {
-            game_board[i][j]= 3;
-            erroneous_board[i][j]= 1;
-        }
+    game_board = malloc(sizeof(int)*ROWS_COLUMNS_NUM);
+    erroneous_board = malloc(sizeof(int)*ROWS_COLUMNS_NUM);
+    fixed_numbers_board = malloc(sizeof(int)*ROWS_COLUMNS_NUM);
+    for (i=0; i<ROWS_COLUMNS_NUM;i++){
+        game_board[i] = malloc(sizeof(int)*ROWS_COLUMNS_NUM);
+        fixed_numbers_board[i] = malloc(sizeof(int)*ROWS_COLUMNS_NUM);
+        erroneous_board[i] = malloc(sizeof(int)*ROWS_COLUMNS_NUM);
     }
 }

@@ -17,8 +17,16 @@ const char *init_commands[] = {"solve", "edit", NULL};
 
 int execute_command(char *command, char *parameters) {
     /* TODO: write documentation */
-    char **params = str_split(parameters, ' ');
+    char **params;
+    if (parameters!=NULL){
+        params = str_split(parameters, ' ');
+    }
     if (strcmp(all_commands[0], command) == 0) {
+        if (params==NULL){
+            printf("Error: invalid command\n");
+            return 1;
+            // TODO: check if this is the right treatment to solve without parameters
+        }
         solve(params[0]);
     } else if (strcmp(all_commands[1], command) == 0) {
         edit(params[0]);
@@ -76,6 +84,7 @@ void play_game() {
     char *command;
     char *parameters;
     int command_max_length;
+    printf("Sudoku\n------\n");
     command_max_length = COMMAND_AND_PARAMS_SIZE;
     command_and_parameters = (char *) malloc(sizeof(char) * command_max_length);
     if (!command_and_parameters) {
@@ -129,6 +138,10 @@ void print_board(int **board) {
     int rows_counter;
     int columns_counter;
     rows_counter = 0;
+    if(ROWS_PER_BLOCK == 0 && COLUMNS_PER_BLOCK == 0){
+        // means the board is empty and therefore there is nothing to print
+        return;
+    }
     for (i = 0; i < (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK + 1); i++) {
         // ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK is overall number of rows (including separator rows)
         //ROWS_PER_BLOCK = m = number of rows of cells per block

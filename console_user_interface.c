@@ -49,9 +49,9 @@ int execute_command(char *command, char *parameters) {
     } else if ((strcmp(all_commands[10], command) == 0)) {
         autofill();
     } else if ((strcmp(all_commands[11], command) == 0)) {
-        execute_get_hint(parameters);
+        execute_get_hint(params);
     } else if ((strcmp(all_commands[12], command) == 0)) {
-        execute_mark_errors(parameters);
+        execute_mark_errors(params);
     }
     else if (strcmp(all_commands[13], command) == 0) {
         restart_game();

@@ -3,7 +3,9 @@
 
 #endif //sudoku_USER_INTERFACE_H
 
-#define COMMAND_AND_PARAMS_SIZE 256
+#define COMMAND_AND_PARAMS_SIZE 257
+
+#include "game_logic.h"
 
 void play_game();
-void print_error(const char *error);
+void print_board(int *board[]);

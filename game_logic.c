@@ -1,15 +1,17 @@
 #include <stdio.h>
+#include <malloc.h>
+#include <assert.h>
+#include <mem.h>
 #include "game_logic.h"
+#include "helper_functions.h"
 
-void execute_solve(char *params){
+
+void execute_solve(char **params){
     // parse args
     // call solve();
-    GAME_MODE = 2;
-    printf("hello solve\n");
+    solve(params[0]);
 }
 void execute_edit(char *params){
-    GAME_MODE = 1;
-    printf("hello edit\n");
 }
 void execute_set_cell(char *params){
     printf("hello set_cell\n");
@@ -28,11 +30,11 @@ void execute_mark_errors(char *params){
 }
 
 
-void solve(char *path[]){
+void solve(char *path){
     // should load the board from file
 }
 
-void edit(char *path[]){
+void edit(char *path){
 
 }
 
@@ -82,4 +84,27 @@ void restart_game(){
 
 void exit_game(){
 
+}
+
+void init_game(){
+    int i;
+    int j;
+    printf("Sudoku\n------\n");
+    GAME_MODE = 1;
+    ROWS_PER_BLOCK = 3;
+    COLUMNS_PER_BLOCK = 3;
+    game_board = malloc(sizeof(int)*9);
+    erroneous_board = malloc(sizeof(int)*9);
+    fixed_numbers_board = malloc(sizeof(int)*9);
+    for (i=0; i<9;i++){
+        game_board[i] = malloc(sizeof(int)*9);
+        fixed_numbers_board[i] = malloc(sizeof(int)*9);
+        erroneous_board[i] = malloc(sizeof(int)*9);
+    }
+    for(i=0;i<9; i++){
+        for(j=0; j<9; j++) {
+            game_board[i][j]= 3;
+            erroneous_board[i][j]= 1;
+        }
+    }
 }

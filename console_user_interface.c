@@ -82,12 +82,16 @@ void play_game() {
     }
     fflush(stdin); // TODO: remove it after testing
     while (fgets(command_and_parameters, command_max_length, stdin) != NULL) {
-        if (command == NULL) {
-            fflush(stdin); // TODO: also should be deleted
-            continue;
+        if (strlen(command_and_parameters)==COMMAND_AND_PARAMS_SIZE){
+            // means that the command is too long the therefore should be considered as invalid.
+            printf("ERROR: invalid command\n");
         }
         command = strtok(command_and_parameters, " \t\r\n");
         parameters = strtok(NULL, "\t\r\n");
+        if (command == NULL) {
+            // we ignore any kind of blank characters
+            continue;
+        }
         // checking if the command is allowed in the current mode
         if (GAME_MODE == 0) {
             if (!check_if_suitable_command(init_commands, command)) {
@@ -109,22 +113,22 @@ void play_game() {
             // means that an exit command was given
             break;
         }
-        fflush(stdin); // TODO: should be deleted after testing
-
+        print_board(game_board);
     }
     // TODO: check if we should free more stuff here
     free(command_and_parameters);
     printf("Exiting...\n");
 }
 
-void print_board(int board[ROWS_PER_BLOCK*COLUMNS_PER_BLOCK][COLUMNS_PER_BLOCK*ROWS_PER_BLOCK]) {
+void print_board(int **board) {
     int i;
     int j;
     int z;
     int rows_counter;
     int columns_counter;
     rows_counter = 0;
-    for (i = 0; i < (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK); i++) {
+    for (i = 0; i < (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK + 1); i++) {
+        // ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK is overall number of rows (including separator rows)
         //ROWS_PER_BLOCK = m = number of rows of cells per block
         if ((i % (ROWS_PER_BLOCK + 1)) == 0) {
             //separator row
@@ -135,10 +139,10 @@ void print_board(int board[ROWS_PER_BLOCK*COLUMNS_PER_BLOCK][COLUMNS_PER_BLOCK*R
             rows_counter++;
         } else {
             columns_counter = 0;
-            for (j = 0; j < (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK); j++) { //TODO: *4
+            for (j = 0; j < (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + ROWS_PER_BLOCK+1); j++) {
                 //COLUMNS_PER_BLOCK = n = number of rows of blocks
-                if ((j % COLUMNS_PER_BLOCK+1) == 0) { //TODO: *4
-                    if (j == ROWS_PER_BLOCK*COLUMNS_PER_BLOCK) { //TODO: *4
+                if ((j % (COLUMNS_PER_BLOCK+1)) == 0) {
+                    if (j == ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + ROWS_PER_BLOCK) {
                         printf("|\n");
                     } else {
                         printf("|");

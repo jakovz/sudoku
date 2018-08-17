@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <mem.h>
 #include "game_logic.h"
-#include "helper_functions.h"
 
 
 void execute_set_cell(char **params){
@@ -14,22 +13,52 @@ void execute_set_cell(char **params){
         set_cell_params[i] = strtol(params[i], &next, 10);
         if (next<=params[i]){
             printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
+            return;
         }
     }
     set_cell(set_cell_params[0],set_cell_params[1],set_cell_params[2]);
 }
-void execute_generate(char *params){
-
-    printf("hello generate\n");
+void execute_generate(char **params){
+    int generate_params[2];
+    int i;
+    char *next;
+    for (i=0;i<2;i++){
+        generate_params[i] = strtol(params[i], &next, 10);
+        if (next<=params[i]){
+            printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
+            return;
+        }
+    }
+    generate(generate_params[0], generate_params[1]);
 }
-void execute_save_board(char *params){
+
+void execute_save_board(char **params){
+    save_board(params[0]);
     printf("hello save_board\n");
 }
-void execute_get_hint(char *params){
-    printf("hello get_hint\n");
+
+void execute_get_hint(char **params){
+    int get_hint_params[2];
+    int i;
+    char *next;
+    for (i=0;i<2;i++){
+        get_hint_params[i] = strtol(params[i], &next, 10);
+        if (next<=params[i]){
+            printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
+            return;
+        }
+    }
+    get_hint(get_hint_params[0], get_hint_params[1]);
 }
-void execute_mark_errors(char *params){
-    printf("hello mark_errors\n");
+
+void execute_mark_errors(char **params){
+    int mark_errors_param;
+    char *next;
+    mark_errors_param = strtol(params[0], &next, 10);
+    if (next<=params[0] || mark_errors_param>1){
+        printf("Error: the value should be 0 or 1\n");
+        return;
+    }
 }
 
 
@@ -57,7 +86,7 @@ void redo(){
 
 }
 
-void save_board(char *path[]){
+void save_board(char *path){
 
 }
 
@@ -97,6 +126,7 @@ void init_game(){
     ROWS_PER_BLOCK = 3;
     COLUMNS_PER_BLOCK = 3;
     ROWS_COLUMNS_NUM = ROWS_PER_BLOCK*COLUMNS_PER_BLOCK;
+    EMPTY_CELLS_NUM = ROWS_COLUMNS_NUM*ROWS_COLUMNS_NUM;
     game_board = malloc(sizeof(int)*9);
     erroneous_board = malloc(sizeof(int)*9);
     fixed_numbers_board = malloc(sizeof(int)*9);

@@ -9,6 +9,7 @@ int **erroneous_board;
 int ROWS_PER_BLOCK;
 int COLUMNS_PER_BLOCK;
 int ROWS_COLUMNS_NUM;
+int EMPTY_CELLS_NUM;
 int GAME_MODE; // 0 - init mode, 1 - edit mode, 2 - solve mode
 int MARK_ERRORS; // 0 - do not mark errors, 1 - mark errors
 
@@ -26,7 +27,7 @@ void num_solutions();
 void generate(int x, int y);
 void validate_solution();
 void get_hint(int x, int y);
-void save_board(char *path[]);
+void save_board(char *path);
 void redo();
 void undo();
 void set_cell(int x, int y, int z);

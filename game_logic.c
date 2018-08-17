@@ -61,9 +61,45 @@ void execute_mark_errors(char **params){
     }
 }
 
-
 void solve(char *path){
     // should load the board from file
+    FILE *fp;
+    int i;
+    int j;
+    int c;
+    int ROWS_PER_BLOCK;
+    int COLUMNS_PER_BLOCK;
+    GAME_MODE = 2;
+    fp = fopen(path,"r");
+    if (fp == NULL){
+        printf("Error: File doesn't exist or cannot be opened\n");
+        return;
+    }
+    else{
+        fscanf(fp, " "); /*skip whitespaces*/
+        ROWS_PER_BLOCK = fgetc(fp);
+        fscanf(fp, " "); /*skip whitespaces*/
+        //fgetc(fp); /*space*/
+        COLUMNS_PER_BLOCK = fgetc(fp);
+        fscanf(fp, " "); /*skip whitespaces*/
+        //fgetc(fp); /*\n*/
+        for (i = 0; i< ROWS_PER_BLOCK*COLUMNS_PER_BLOCK; i++){
+            for (j = 0; j< ROWS_PER_BLOCK*COLUMNS_PER_BLOCK; j++){
+                game_board[i][j] = fgetc(fp);
+                if (feof(fp)){
+                    break;
+                } else if ((c = fgetc(fp)) == '.'){
+                    fixed_numbers_board[i][j] = 1;
+                    fscanf(fp, " "); /*skip whitespaces*/
+                    //fgetc(fp); /*space or \n*/
+                } else{
+                    fscanf(fp, " "); /*skip whitespaces*/
+                    //fgetc(fp); /*space or \n*/
+                }
+            }
+        }
+    }
+    fclose(fp);
 }
 
 void edit(char *path){

@@ -91,7 +91,7 @@ void play_game() {
         printf("Error: play_game() has failed\n");
         exit(-1);
     }
-    fflush(stdin); // TODO: remove it after testing
+    printf("Enter your command:\n");
     while (fgets(command_and_parameters, command_max_length, stdin) != NULL) {
         if (strlen(command_and_parameters)==COMMAND_AND_PARAMS_SIZE){
             // means that the command is too long the therefore should be considered as invalid.
@@ -129,8 +129,9 @@ void play_game() {
         }
 
         print_board(game_board);
+        printf("Enter your command:\n");
     }
-    // TODO: check if we should free more stuff here
+    // TODO: we should free more stuff here (game board etc.)
     free(command_and_parameters);
     printf("Exiting...\n");
 }

@@ -461,6 +461,7 @@ void restart_game() {
 }
 
 void exit_game() {
+    printf("Exiting...\n");
     while ((*game_moves).prev != NULL) {
         game_moves = (*game_moves).prev;
     }

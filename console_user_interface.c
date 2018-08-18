@@ -136,7 +136,7 @@ void play_game() {
     }
     // TODO: we should free more stuff here (game board etc.)
     free(command_and_parameters);
-    printf("Exiting...\n");
+    exit_game();
 }
 
 void print_board(int **board) {

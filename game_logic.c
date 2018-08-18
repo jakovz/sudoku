@@ -193,8 +193,7 @@ void save_board(char *path){
                 }
             }
         }
-        validate_solution();
-        if (validation_passed == 0){
+        if (validate_solution() == 0){
             printf("ERROR: board validation failed\n");
             return;
         }
@@ -231,9 +230,9 @@ void get_hint(int x, int y){
 
 }
 
-void validate_solution(){
+int validate_solution(){
     // a call to ilp solver here
-    //TODO: need to return/update a flag that says whether validation passed or not
+    return 1;
 }
 
 void generate(int x, int y){

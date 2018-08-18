@@ -33,7 +33,7 @@ void restart_game();
 void autofill();
 void num_solutions();
 void generate(int x, int y);
-void validate_solution();
+int validate_solution();
 void get_hint(int x, int y);
 void save_board(char *path);
 void redo();

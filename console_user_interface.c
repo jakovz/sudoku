@@ -26,7 +26,11 @@ int execute_command(char *command, char **params) {
         }
         solve(params[0]);
     } else if (strcmp(all_commands[1], command) == 0) {
-        edit(params[0]);
+        if (params==NULL){
+            edit(NULL);
+        } else{
+            edit(params[0]);
+        }
     } else if (strcmp(all_commands[2], command) == 0) {
         //print_board(); // should pass our board as argument here
     } else if ((strcmp(all_commands[3], command) == 0)) {

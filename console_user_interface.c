@@ -103,7 +103,7 @@ void play_game() {
             // we ignore any kind of blank characters
             continue;
         }
-        if (parameters==NULL){
+        if (parameters!=NULL){
             splitted_params = str_split(parameters, ' ');
         }
         // checking if the command is allowed in the current mode

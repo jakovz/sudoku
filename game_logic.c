@@ -185,7 +185,8 @@ void redo() {
     new_value = (*(*game_moves).next).new_z_value;
     printf("Redo %d,%d: from %d to %d\n", (*game_moves).x_value, (*game_moves).y_value, (*game_moves).new_z_value,
            new_value);
-
+    game_board[(*game_moves).x_value][(*game_moves).y_value] = new_value;
+    game_moves = (*game_moves).next;
 }
 
 void save_board(char *path) {
@@ -256,12 +257,134 @@ void num_solutions() {
 
 }
 
-void autofill() {
+void copy_board(int **from, int **to) {
+    int i;
+    int j;
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            to[i][j] = from[i][j];
+        }
+    }
+}
 
+int number_is_available_in_row(int number, int row) {
+    int i;
+    for (i=0; i<ROWS_COLUMNS_NUM; i++){
+        if (game_board[row][i]==number){
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int number_is_available_in_column(int number, int column) {
+    int i;
+    for (i=0; i<ROWS_COLUMNS_NUM; i++){
+        if(game_board[i][column]==number){
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int number_is_available_in_block(int number, int row, int column) {
+    int i;
+    int j;
+    int row_lower_bound;
+    int row_upper_bound;
+    int column_lower_bound;
+    int column_upper_bound;
+    row_lower_bound = (row%ROWS_PER_BLOCK);
+    row_upper_bound = row_lower_bound+ROWS_PER_BLOCK;
+    column_lower_bound = (column&COLUMNS_PER_BLOCK);
+    column_upper_bound = column_lower_bound + COLUMNS_PER_BLOCK;
+    for (i=row_lower_bound; i<row_upper_bound; i++){
+        for (j=column_lower_bound; j<column_upper_bound; j++){
+            if (game_board[i][j]==number){
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+int get_autofill_value(int x, int y) {
+    int i;
+    int available_number;
+    int count; // counts the number of available numbers that can be filled in the empty cell.
+    count = 0;
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        // iterating all possible numbers
+        if (number_is_available_in_row(i, x) && number_is_available_in_column(i, y) &&
+            number_is_available_in_block(i, x, y)) {
+            count++;
+            available_number = i;
+        }
+    }
+    if (count > 1 || count == 0) {
+        return 0;
+    } else if (count == 1) {
+        return available_number;
+    }
+}
+
+
+void autofill() {
+    int i;
+    int j;
+    int new_value;
+    int **filled_board;
+    if (!validate_solution()) {
+        printf("Error: board contains erroneous values\n");
+        return;
+    }
+    filled_board = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+    if (filled_board == NULL) {
+        printf("Error: autofill failed\n");
+        return;
+    }
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        filled_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+        if (filled_board[i] == NULL) {
+            printf("Error: autofill failed\n");
+            return;
+        }
+    }
+    copy_board(game_board, filled_board);
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            if (game_board[i][j] == 0) {
+                // we are going to check if a cell has an obvious value only if the cell is empty
+                if ((new_value = get_autofill_value(i, j)) > 0) {
+                    // means that there is an autofill option
+                    filled_board[i][j] = new_value; // we do not want the new values to affect autofill.
+                }
+            }
+        }
+    }
+    copy_board(filled_board, game_board);
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        free(filled_board[i]);
+    }
+    free(filled_board);
+}
+
+void clear_moves_list_from_first(){
+    // this function assumes game_moves have no prev value (the current move is the first move in the list)
+    struct game_move *current;
+    while((*game_moves).next!=NULL){
+        current = game_moves;
+        game_moves = (*game_moves).next;
+        free(current);
+    }
 }
 
 void restart_game() {
-
+    while((*game_moves).prev!=NULL){
+        undo();
+    }
+    clear_moves_list_from_first();
+    printf("Board reset\n");
 }
 
 void exit_game() {
@@ -276,10 +399,18 @@ void init_game() {
     game_board = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
     erroneous_board = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
     fixed_numbers_board = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+    if (game_board == NULL || erroneous_board == NULL || fixed_numbers_board == NULL) {
+        printf("Error: game initialization failed\n"); // TODO: validate that this is the message that should be printed
+        return;
+    }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         game_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         fixed_numbers_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         erroneous_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+        if (game_board[i] == NULL || erroneous_board[i] == NULL || fixed_numbers_board[i] == NULL) {
+            printf("Error: game initialization failed\n"); // TODO: validate that this is the message that should be printed
+            return;
+        }
     }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++){

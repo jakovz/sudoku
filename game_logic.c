@@ -105,10 +105,10 @@ void edit(char *path) {
     int c;
     GAME_MODE = 1; /*Edit mode*/
     MARK_ERRORS = 1; //TODO: need this? or is it enough to check that GAME_MODE=1
-    if (path == NULL) { //TODO: path==NULL???
+    if (path == NULL) {
         //create an empty 9x9 board
-        ROWS_PER_BLOCK = 9;
-        COLUMNS_PER_BLOCK = 9;
+        ROWS_PER_BLOCK = 3;
+        COLUMNS_PER_BLOCK = 3;
         init_game();
     } else {
         // loads the board from a file
@@ -280,5 +280,12 @@ void init_game() {
         game_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         fixed_numbers_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         erroneous_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+    }
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++){
+            game_board[i][j] = 0;
+            fixed_numbers_board[i][j] = 0;
+            erroneous_board[i][j] = 0;
+        }
     }
 }

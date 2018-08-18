@@ -106,6 +106,8 @@ void play_game() {
         }
         if (parameters!=NULL){
             splitted_params = str_split(parameters, ' ');
+        } else {
+            splitted_params = NULL;
         }
         // checking if the command is allowed in the current mode
         if (GAME_MODE == 0) {
@@ -159,10 +161,10 @@ void print_board(int **board) {
             rows_counter++;
         } else {
             columns_counter = 0;
-            for (j = 0; j < (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + ROWS_PER_BLOCK+1); j++) {
+            for (j = 0; j < (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + ROWS_PER_BLOCK - 1); j++) {
                 //COLUMNS_PER_BLOCK = n = number of rows of blocks
                 if ((j % (COLUMNS_PER_BLOCK+1)) == 0) {
-                    if (j == ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + ROWS_PER_BLOCK) {
+                    if (j == ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + ROWS_PER_BLOCK - 1) {
                         printf("|\n");
                     } else {
                         printf("|");

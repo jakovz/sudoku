@@ -147,12 +147,6 @@ void mark_errors(int X){
     MARK_ERRORS = X;
 }
 
-void set_cell(int x, int y, int z){
-    int old;
-    old = game_board[x][y];
-    game_board[x][y] = z;
-    update_moves_list(x,y,z, old);
-}
 void update_moves_list(int x, int y, int z, int old) {
     struct game_move *last_move;
     last_move = game_moves;
@@ -163,6 +157,13 @@ void update_moves_list(int x, int y, int z, int old) {
     (*game_moves).new_z_value = z;
     (*game_moves).old_z_value = old;
     (*game_moves).prev = last_move;
+}
+
+void set_cell(int x, int y, int z){
+    int old;
+    old = game_board[x][y];
+    game_board[x][y] = z;
+    update_moves_list(x,y,z, old);
 }
 
 

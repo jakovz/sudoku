@@ -32,7 +32,7 @@ int execute_command(char *command, char **params) {
             edit(params[0]);
         }
     } else if (strcmp(all_commands[2], command) == 0) {
-        //print_board(); // should pass our board as argument here
+        print_board(game_board);
     } else if ((strcmp(all_commands[3], command) == 0)) {
         execute_set_cell(params);
     } else if ((strcmp(all_commands[4], command) == 0)) {
@@ -152,20 +152,20 @@ void print_board(int **board) {
     }
     for (i = 0; i < (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK + 1); i++) {
         // ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK is overall number of rows (including separator rows)
-        //ROWS_PER_BLOCK = m = number of rows of cells per block
+        // ROWS_PER_BLOCK = m = number of rows of cells per block
         if ((i % (ROWS_PER_BLOCK + 1)) == 0) {
             //separator row
-            for (z = 0; z < (4 * (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK) + ROWS_PER_BLOCK - 1); z++) {
+            for (z = 0; z < (4*(ROWS_PER_BLOCK*COLUMNS_PER_BLOCK) + ROWS_PER_BLOCK); z++) {
                 printf("-");
             }
             printf("-\n");
             rows_counter++;
         } else {
             columns_counter = 0;
-            for (j = 0; j < (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + ROWS_PER_BLOCK - 1); j++) {
+            for (j = 0; j < (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + ROWS_PER_BLOCK +1); j++) {
                 //COLUMNS_PER_BLOCK = n = number of rows of blocks
                 if ((j % (COLUMNS_PER_BLOCK+1)) == 0) {
-                    if (j == ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + ROWS_PER_BLOCK - 1) {
+                    if (j == ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + ROWS_PER_BLOCK) {
                         printf("|\n");
                     } else {
                         printf("|");
@@ -185,6 +185,9 @@ void print_board(int **board) {
                         if (erroneous_board[i - rows_counter][j - columns_counter] == 1){
                             /*means that this is an erroneous value*/
                             printf("*");
+                        }
+                        else{
+                            printf(" ");
                         }
                     } else {
                         printf(" ");

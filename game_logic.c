@@ -177,6 +177,14 @@ void undo() {
 }
 
 void redo() {
+    int new_value;
+    if ((*game_moves).next == NULL) {
+        printf("Error: no moves to redo\n");
+        return;
+    }
+    new_value = (*(*game_moves).next).new_z_value;
+    printf("Redo %d,%d: from %d to %d\n", (*game_moves).x_value, (*game_moves).y_value, (*game_moves).new_z_value,
+           new_value);
 
 }
 

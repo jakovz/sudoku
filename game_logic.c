@@ -98,7 +98,48 @@ void solve(char *path){
 }
 
 void edit(char *path){
-
+    FILE *fp;
+    int i;
+    int j;
+    int c;
+    GAME_MODE = 1; /*Edit mode*/
+    MARK_ERRORS = 1; //TODO: need this? or is it enough to check that GAME_MODE=1
+    if (path == NULL){ //TODO: path==NULL???
+        //create an empty 9x9 board
+        ROWS_PER_BLOCK = 9;
+        COLUMNS_PER_BLOCK = 9;
+        init_game();
+    }
+    else{
+        // loads the board from a file
+        fp = fopen(path,"r");
+        if (fp == NULL){
+            printf("Error: File doesn't exist or cannot be opened\n");
+            return;
+        }
+        else{
+            fscanf(fp, " "); /*skip whitespaces*/
+            fscanf(fp, "%d", &ROWS_PER_BLOCK);
+            fscanf(fp, " "); /*skip whitespaces*/
+            fscanf(fp, "%d", &COLUMNS_PER_BLOCK);
+            init_game();
+            fscanf(fp, " "); /*skip whitespaces*/
+            for (i = 0; i< ROWS_COLUMNS_NUM; i++){
+                for (j = 0; j< ROWS_COLUMNS_NUM; j++){
+                    fscanf(fp, "%d", &(game_board[i][j]));
+                    if (feof(fp)){
+                        break;
+                    } else if ((c = fgetc(fp)) == '.'){
+                        fixed_numbers_board[i][j] = 1;
+                        fscanf(fp, " "); /*skip whitespaces*/
+                    } else{
+                        fscanf(fp, " "); /*skip whitespaces*/
+                    }
+                }
+            }
+        }
+        fclose(fp);
+    }
 }
 
 void mark_errors(int X){
@@ -118,7 +159,55 @@ void redo(){
 }
 
 void save_board(char *path){
-
+    FILE *fp;
+    char *size_to_write;
+    int i;
+    int j;
+    /*save is only available in Edit and Solve modes*/
+    if((GAME_MODE != 1) && (GAME_MODE != 2)){
+        printf("ERROR: invalid command\n");
+    } else if (GAME_MODE == 1){
+        /*Edit mode*/
+        for (i = 0; i < ROWS_COLUMNS_NUM; i++){
+            for (j = 0; j < ROWS_COLUMNS_NUM; j++){
+                if (erroneous_board[i][j] == 1){
+                    printf("ERROR: board contains erroneous values\n");
+                    return;
+                }
+            }
+        }
+        validate_solution();
+        if (validation_passed == 0){
+            printf("ERROR: board validation failed\n");
+            return;
+        }
+    }
+    fp = fopen(path,"w+");
+    if (fp == NULL){
+        printf("Error: File cannot be created or modified\n");
+        return;
+    } else {
+        /*save game_board to file*/
+        fputc(ROWS_PER_BLOCK, fp);
+        fputc(' ', fp);
+        fputc(COLUMNS_PER_BLOCK, fp);
+        fputc('\n', fp);
+        for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+            for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+                fputc(game_board[i][j], fp);
+                if ((GAME_MODE == 1) && (game_board[i][j] != 0)) {
+                    /*in Edit mode, all cells containing values are marked as "fixed"*/
+                    fixed_numbers_board[i][j] = 1;
+                    fputc('.', fp);
+                } else if (fixed_numbers_board[i][j] == 1){
+                    fputc('.', fp);
+                }
+                fputc(' ', fp);
+            }
+            fputc('\n', fp);
+        }
+        printf("Saved to: %s\n", path);
+    }
 }
 
 void get_hint(int x, int y){
@@ -127,6 +216,7 @@ void get_hint(int x, int y){
 
 void validate_solution(){
     // a call to ilp solver here
+    //TODO: need to return/update a flag that says whether validation passed or not
 }
 
 void generate(int x, int y){

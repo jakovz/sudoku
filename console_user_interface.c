@@ -8,6 +8,7 @@
 const char *all_commands[] = {"solve", "edit", "print_board", "set", "validate", "generate", "undo", "redo",
                               "save", "num_solutions", "autofill", "hint", "mark_errors", "reset", "exit", NULL};
 
+
 const char *edit_commands[] = {"solve", "edit", "print_board", "set", "validate", "generate", "undo", "redo",
                                "save", "num_solutions", "reset", "exit", NULL};
 const char *solve_commands[] = {"solve", "edit", "mark_errors", "print_board", "set", "validate", "undo", "redo",
@@ -99,7 +100,7 @@ void play_game() {
             // we ignore any kind of blank characters
             continue;
         }
-        if (parameters==NULL){
+        if (parameters!=NULL){
             splitted_params = str_split(parameters, ' ');
         }
         // checking if the command is allowed in the current mode

@@ -5,7 +5,5 @@
 
 #define COMMAND_AND_PARAMS_SIZE 257
 
-#include "game_logic.h"
-
 void play_game();
 void print_board(int *board[]);

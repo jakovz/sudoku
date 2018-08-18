@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <mem.h>
 #include "game_logic.h"
+#include "helper_functions.h"
 
 
 void execute_set_cell(char **params){
@@ -143,15 +144,31 @@ void edit(char *path){
 }
 
 void mark_errors(int X){
-
+    MARK_ERRORS = X;
 }
 
 void set_cell(int x, int y, int z){
-
+    int old;
+    old = game_board[x][y];
+    game_board[x][y] = z;
+    update_moves_list(x,y,z, old);
+}
+void update_moves_list(int x, int y, int z, int old) {
+    struct game_move *last_move;
+    last_move = game_moves;
+    (*game_moves).next = malloc(sizeof(struct game_move));
+    game_moves = (*game_moves).next;
+    (*game_moves).x_value = x;
+    (*game_moves).y_value = y;
+    (*game_moves).new_z_value = z;
+    (*game_moves).old_z_value = old;
+    (*game_moves).prev = last_move;
 }
 
-void undo(){
 
+void undo(){
+    game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
+    game_moves = (*game_moves).prev;
 }
 
 void redo(){

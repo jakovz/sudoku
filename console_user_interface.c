@@ -5,22 +5,18 @@
 #include "game_logic.h"
 #include "helper_functions.h"
 
-
 const char *all_commands[] = {"solve", "edit", "print_board", "set", "validate", "generate", "undo", "redo",
-                                    "save", "num_solutions", "autofill", "hint", "mark_errors", "reset", "exit", NULL};
+                              "save", "num_solutions", "autofill", "hint", "mark_errors", "reset", "exit", NULL};
 
 const char *edit_commands[] = {"solve", "edit", "print_board", "set", "validate", "generate", "undo", "redo",
-                                     "save", "num_solutions", "reset", "exit", NULL};
+                               "save", "num_solutions", "reset", "exit", NULL};
 const char *solve_commands[] = {"solve", "edit", "mark_errors", "print_board", "set", "validate", "undo", "redo",
-                                      "save", "hint", "num_solutions", "autofill", "reset", "exit", NULL};
+                                "save", "hint", "num_solutions", "autofill", "reset", "exit", NULL};
 const char *init_commands[] = {"solve", "edit", NULL};
 
-int execute_command(char *command, char *parameters) {
+
+int execute_command(char *command, char **params) {
     /* TODO: write documentation */
-    char **params;
-    if (parameters!=NULL){
-        params = str_split(parameters, ' ');
-    }
     if (strcmp(all_commands[0], command) == 0) {
         if (params==NULL){
             printf("Error: invalid command\n");
@@ -61,7 +57,6 @@ int execute_command(char *command, char *parameters) {
         // TODO: check what else might cause an invalid command
         printf("Error: invalid command\n");
     }
-    fflush(stdin); // TODO: remove this
     return 1;
 }
 
@@ -83,6 +78,7 @@ void play_game() {
     char *command_and_parameters;
     char *command;
     char *parameters;
+    char **splitted_params;
     int command_max_length;
     printf("Sudoku\n------\n");
     command_max_length = COMMAND_AND_PARAMS_SIZE;
@@ -103,6 +99,9 @@ void play_game() {
             // we ignore any kind of blank characters
             continue;
         }
+        if (parameters==NULL){
+            splitted_params = str_split(parameters, ' ');
+        }
         // checking if the command is allowed in the current mode
         if (GAME_MODE == 0) {
             if (!check_if_suitable_command(init_commands, command)) {
@@ -120,10 +119,11 @@ void play_game() {
                 continue;
             }
         }
-        if (!execute_command(command, parameters)){
+        if (!execute_command(command, splitted_params)){
             // means that an exit command was given
             break;
         }
+
         print_board(game_board);
     }
     // TODO: check if we should free more stuff here

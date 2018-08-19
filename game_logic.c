@@ -325,8 +325,8 @@ int check_if_board_erroneous() {
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
             number = game_board[i][j];
-            if (!(number_is_available_in_row(number, x) && number_is_available_in_column(number, y) &&
-                  number_is_available_in_block(number, x, y))) {
+            if (!(number_does_not_exist_in_row(number, x) && number_does_not_exist_in_column(number, y) &&
+                  number_does_not_exist_in_block(number, x, y))) {
                 return 1;
             }
         }
@@ -425,7 +425,7 @@ void copy_board(int **from, int **to, int save_moves) {
     }
 }
 
-int number_is_available_in_row(int number, int row) {
+int number_does_not_exist_in_row(int number, int row) {
     int i;
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         if (game_board[row][i] == number) {
@@ -435,7 +435,7 @@ int number_is_available_in_row(int number, int row) {
     return 1;
 }
 
-int number_is_available_in_column(int number, int column) {
+int number_does_not_exist_in_column(int number, int column) {
     int i;
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         if (game_board[i][column] == number) {
@@ -445,7 +445,7 @@ int number_is_available_in_column(int number, int column) {
     return 1;
 }
 
-int number_is_available_in_block(int number, int row, int column) {
+int number_does_not_exist_in_block(int number, int row, int column) {
     int i;
     int j;
     int row_lower_bound;
@@ -466,6 +466,42 @@ int number_is_available_in_block(int number, int row, int column) {
     return 1;
 }
 
+void get_available_numbers_for_set(int available_numbers[ROWS_COLUMNS_NUM], int rows_index, int columns_index,
+                                   int new_solved_board[ROWS_COLUMNS_NUM][ROWS_COLUMNS_NUM]) {
+    int i;
+    int j;
+    int block_first_row;
+    int block_first_column;
+    int block_last_row;
+    int block_last_column;
+    /* first we check for the row*/
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        if (new_solved_board[rows_index][i] != 0) {
+            if (new_solved_board[rows_index][i] != 0) {
+                available_numbers[new_solved_board[rows_index][i] - 1]++;
+            }
+        }
+    }
+    /* then we check the column*/
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        if (new_solved_board[i][columns_index] != 0) {
+            available_numbers[new_solved_board[i][columns_index] - 1]++;
+        }
+    }
+    /* and last we check the block*/
+    block_first_row = rows_index - rows_index % ROWS_PER_BLOCK;
+    block_last_row = block_first_row + ROWS_PER_BLOCK;
+    block_first_column = columns_index - columns_index % COLUMNS_PER_BLOCK;
+    block_last_column = block_first_column + COLUMNS_PER_BLOCK;
+    for (i = block_first_row; i < block_last_row; i++) {
+        for (j = block_first_column; j < block_last_column; j++) {
+            if (new_solved_board[i][j] != 0 && rows_index != i && columns_index != j) {
+                available_numbers[new_solved_board[i][j] - 1]++;
+            }
+        }
+    }
+}
+
 int get_autofill_value(int x, int y) {
     int i;
     int available_number;
@@ -473,8 +509,8 @@ int get_autofill_value(int x, int y) {
     count = 0;
     for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
         // iterating all possible numbers
-        if (number_is_available_in_row(i, x) && number_is_available_in_column(i, y) &&
-            number_is_available_in_block(i, x, y)) {
+        if (number_does_not_exist_in_row(i, x) && number_does_not_exist_in_column(i, y) &&
+            number_does_not_exist_in_block(i, x, y)) {
             count++;
             available_number = i;
         }

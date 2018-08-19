@@ -67,6 +67,22 @@ void execute_mark_errors(char **params) {
     }
 }
 
+void copy_board(int **from, int **to, int save_moves) {
+    int i;
+    int j;
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            if (save_moves) {
+                if (from[i][j] != 0 && from[i][j] != to[i][j]) {
+                    set_cell(i, j, from[i][j]);
+                }
+            } else {
+                to[i][j] = from[i][j];
+            }
+        }
+    }
+}
+
 void solve(char *path) {
     // loads the board from file
     FILE *fp;
@@ -364,18 +380,36 @@ int try_generate(int x) {
     int x_index;
     int y_index;
     int i;
+    int j;
+    int count;
     int *legal_values;
     int rand_value;
+    count = 0;
+    legal_values = malloc(sizeof(int)*ROWS_COLUMNS_NUM);
     for (i = 0; i < x; i++) {
         x_index = rand() % ROWS_COLUMNS_NUM;
         y_index = rand() % ROWS_COLUMNS_NUM;
-        if (sizeof(legal_values) == 0) {
+        get_available_numbers_for_set(legal_values, x_index, y_index, game_board);
+        for (j=0; j<ROWS_COLUMNS_NUM; j++){
+            if (legal_values[j]>0){
+                count++;
+            }
+        }
+        if (count == 0) {
             clear_board();
             return 0;
         }
-        rand_value = rand() % sizeof(legal_values);
-        game_board[x_index][y_index] = rand_value;
+        rand_value = rand() % count;
+        j = 0;
+        while (rand_value>0){
+            if (legal_values[i]==0){
+                count--;
+            }
+            j++;
+        }
+        game_board[x_index][y_index] = legal_values[j];
     }
+    free(legal_values);
     if (!solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
         return 0;
     }
@@ -384,7 +418,13 @@ int try_generate(int x) {
 
 void generate(int x, int y) {
     int i;
-    i = 0;
+    int x_index;
+    int y_index;
+    int **tmp_board;
+    tmp_board = (int **)malloc(sizeof(int*)*ROWS_COLUMNS_NUM);
+    for (i=0; i<ROWS_COLUMNS_NUM; i++){
+        tmp_board[i] = (int *)malloc(sizeof(int)*ROWS_COLUMNS_NUM);
+    }
     if (EMPTY_CELLS_NUM < ROWS_COLUMNS_NUM * ROWS_COLUMNS_NUM) {
         printf("Error: board is not empty\n"); // TODO: is it a space before the \n in the instructions document?
         return;
@@ -393,6 +433,7 @@ void generate(int x, int y) {
         printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
         return;
     }
+    i = 0;
     while (!try_generate(x) && i < 1000) {
         i++;
     }
@@ -401,6 +442,13 @@ void generate(int x, int y) {
         return;
     }
     // if the program got here, it means that the board was generated successfully
+    copy_board(solved_board, tmp_board, 0);
+    for (i = 0; i < y; i++) {
+        x_index = rand() % ROWS_COLUMNS_NUM;
+        y_index = rand() % ROWS_COLUMNS_NUM;
+        tmp_board[x_index][y_index] = 0;
+    }
+    copy_board(tmp_board, game_board, 1);
 }
 
 void num_solutions() {
@@ -416,22 +464,6 @@ void num_solutions() {
     }
     else{
         printf("The puzzle has more than 1 solution, try to edit it further\n");
-    }
-}
-
-void copy_board(int **from, int **to, int save_moves) {
-    int i;
-    int j;
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
-            if (save_moves) {
-                if (from[i][j] != 0 && from[i][j] != to[i][j]) {
-                    set_cell(i, j, from[i][j]);
-                }
-            } else {
-                to[i][j] = from[i][j];
-            }
-        }
     }
 }
 

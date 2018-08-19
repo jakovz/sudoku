@@ -320,9 +320,10 @@ int check_if_board_erroneous() {
     int j;
     int x;
     int y;
-    int number = game_board[x][y];
+    int number;
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            number = game_board[i][j];
             if (!(number_is_available_in_row(number, x) && number_is_available_in_column(number, y) &&
                   number_is_available_in_block(number, x, y))) {
                 return 1;

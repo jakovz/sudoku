@@ -6,6 +6,7 @@
 #include "game_logic.h"
 #include "helper_functions.h"
 #include "ilp_solver.h"
+#include "exhaustive_backtracking_solver.h"
 
 
 void execute_set_cell(char **params) {
@@ -393,7 +394,19 @@ void generate(int x, int y) {
 }
 
 void num_solutions() {
-
+    int ans;
+    if(check_if_board_erroneous() == 1){
+        printf("Error: board contains erroneous values\n");
+        return;
+    }
+    ans = exhaustive_backtracking(0, 0, game_board, 0); //TODO: correct parameters?
+    printf("Number of solutions: %d\n", ans);
+    if(ans == 1){
+        printf("This is a good board!\n");
+    }
+    else{
+        printf("The puzzle has more than 1 solution, try to edit it further\n");
+    }
 }
 
 void copy_board(int **from, int **to, int save_moves) {

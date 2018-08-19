@@ -3,4 +3,4 @@ project(sudoku C)
 
 set(CMAKE_C_STANDARD 90)
 
-add_executable(sudoku main.c console_user_interface.c game_logic.c ilp_solver.c puzzle_generator.c exhaustive_backtracking_solver.c exhaustive_backtracking_solver.h game_logic.h ilp_solver.h puzzle_generator.h console_user_interface.h helper_functions.c helper_functions.h)
+add_executable(sudoku main.c console_user_interface.c game_logic.c ilp_solver.c puzzle_generator.c exhaustive_backtracking_solver.c exhaustive_backtracking_solver.h game_logic.h ilp_solver.h puzzle_generator.h console_user_interface.h helper_functions.c helper_functions.h gurobi_c.h)

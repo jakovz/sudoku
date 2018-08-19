@@ -4,6 +4,7 @@
 #include <mem.h>
 #include "game_logic.h"
 #include "helper_functions.h"
+#include "ilp_solver.h"
 
 
 void execute_set_cell(char **params) {
@@ -196,7 +197,9 @@ void set_cell(int x, int y, int z) {
     EMPTY_CELLS_NUM--;
     update_moves_list(x, y, z, old);
     if (MARK_ERRORS) {
-        // TODO: should validate here and mark as erroneous if it is.
+        if (!validate_solution()){
+            erroneous_board[x][y] = 1;
+        }
     }
     if (EMPTY_CELLS_NUM == 0) {
         if (!validate_solution()) {
@@ -311,9 +314,34 @@ void get_hint(int x, int y) {
 
 }
 
+int check_if_board_erroneous(){
+    int i;
+    int j;
+    int x;
+    int y;
+    int number = game_board[x][y];
+    for (i=0; i<ROWS_COLUMNS_NUM; i++){
+        for(j=0; j<ROWS_COLUMNS_NUM;j++){
+            if (!(number_is_available_in_row(number, x) && number_is_available_in_column(number, y)&& number_is_available_in_block(number, x, y))){
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 int validate_solution() {
-    // a call to ilp solver here
-    return 1;
+    if (check_if_board_erroneous()){
+        printf("Validation failed: board is unsolvable\n");
+        return 0;
+    }
+    else if(solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)){
+        printf("Validation passed: board is solvable\n");
+        return 1;
+    } else {
+        printf("Validation failed: board is unsolvable\n");
+        return 0;
+    }
 }
 
 void generate(int x, int y) {

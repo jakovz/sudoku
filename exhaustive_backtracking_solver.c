@@ -21,8 +21,12 @@ int exhaustive_backtracking(int rows_index, int columns_index, int new_solved_bo
         }
             /* if this is the last cell and its value is already set*/
         else if (((rows_index + 1) == ROWS_COLUMNS_NUM) && ((columns_index + 1) == ROWS_COLUMNS_NUM)) {
-            num_of_solutions++;
             //return 0; //TODO: doesn't finish when the last cell is filled
+            num_of_solutions++;
+
+
+            p = new_solved_board[rows_index][columns_index];
+            new_solved_board[rows_index][columns_index] = p+1;
         }
     }
 

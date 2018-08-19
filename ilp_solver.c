@@ -17,7 +17,7 @@ void create_empty_model(int **game_board, double *lb, char *vtype, char **names,
                     lb[i * rows_columns * rows_columns + j * rows_columns + v] = 0;
                 vtype[i * rows_columns * rows_columns + j * rows_columns + v] = GRB_BINARY;
 
-                 [i * rows_columns * rows_columns + j * rows_columns + v] = cursor;
+                names[i * rows_columns * rows_columns + j * rows_columns + v] = cursor;
                 sprintf(names[i * rows_columns * rows_columns + j * rows_columns + v], "x[%d,%d,%d]", i, j,
                         v + 1);
                 cursor += strlen(names[i * rows_columns * rows_columns + j * rows_columns + v]) + 1;

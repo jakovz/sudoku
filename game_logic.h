@@ -14,6 +14,7 @@ struct game_move{
 int **game_board;
 int **fixed_numbers_board;
 int **erroneous_board;
+int **solved_board;
 int ROWS_PER_BLOCK;
 int COLUMNS_PER_BLOCK;
 int ROWS_COLUMNS_NUM;

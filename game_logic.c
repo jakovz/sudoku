@@ -2,6 +2,7 @@
 #include <malloc.h>
 #include <assert.h>
 #include <mem.h>
+#include <time.h>
 #include "game_logic.h"
 #include "helper_functions.h"
 #include "ilp_solver.h"
@@ -197,7 +198,7 @@ void set_cell(int x, int y, int z) {
     EMPTY_CELLS_NUM--;
     update_moves_list(x, y, z, old);
     if (MARK_ERRORS) {
-        if (!validate_solution()){
+        if (!validate_solution()) {
             erroneous_board[x][y] = 1;
         }
     }
@@ -314,15 +315,16 @@ void get_hint(int x, int y) {
 
 }
 
-int check_if_board_erroneous(){
+int check_if_board_erroneous() {
     int i;
     int j;
     int x;
     int y;
     int number = game_board[x][y];
-    for (i=0; i<ROWS_COLUMNS_NUM; i++){
-        for(j=0; j<ROWS_COLUMNS_NUM;j++){
-            if (!(number_is_available_in_row(number, x) && number_is_available_in_column(number, y)&& number_is_available_in_block(number, x, y))){
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            if (!(number_is_available_in_row(number, x) && number_is_available_in_column(number, y) &&
+                  number_is_available_in_block(number, x, y))) {
                 return 1;
             }
         }
@@ -331,11 +333,10 @@ int check_if_board_erroneous(){
 }
 
 int validate_solution() {
-    if (check_if_board_erroneous()){
+    if (check_if_board_erroneous()) {
         printf("Validation failed: board is unsolvable\n");
         return 0;
-    }
-    else if(solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)){
+    } else if (solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
         printf("Validation passed: board is solvable\n");
         return 1;
     } else {
@@ -344,8 +345,50 @@ int validate_solution() {
     }
 }
 
-void generate(int x, int y) {
+int try_generate(int x) {
+    int x_index;
+    int y_index;
+    int i;
+    int legal_values;
+    int rand_value;
+    for (i = 0; i < x; i++) {
+        x_index = rand() % ROWS_COLUMNS_NUM;
+        y_index = rand() % ROWS_COLUMNS_NUM;
+        if (sizeof(legal_values) == 0) {
+            // TODO: clear the board
+            return 0;
+        }
+        rand_value = rand() % sizeof(legal_values);
+        game_board[x_index][y_index] = rand_value;
+    }
+    if (!solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
+        return 0;
+    }
+}
 
+void generate(int x, int y) {
+    int i;
+    int x_index;
+    int y_index;
+    int *legal_values;
+    int rand_value;
+    i = 0;
+    if (EMPTY_CELLS_NUM < ROWS_COLUMNS_NUM * ROWS_COLUMNS_NUM) {
+        printf("Error: board is not empty\n"); // TODO: is it a space before the \n in the instructions document?
+        return;
+    }
+    if (x > EMPTY_CELLS_NUM) {
+        printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
+        return;
+    }
+    while (!try_generate(x) && i < 1000) {
+        i++;
+    }
+    if (i>=1000){
+        printf("Error: puzzle generator failed\n");
+        return;
+    }
+    // if the program got here, it means that the board was generated successfully
 }
 
 void num_solutions() {
@@ -358,7 +401,7 @@ void copy_board(int **from, int **to, int save_moves) {
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
             if (save_moves) {
-                if(from[i][j]!=0 && from[i][j]!=to[i][j]){
+                if (from[i][j] != 0 && from[i][j] != to[i][j]) {
                     set_cell(i, j, from[i][j]);
                 }
             } else {
@@ -416,7 +459,7 @@ int get_autofill_value(int x, int y) {
     count = 0;
     for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
         // iterating all possible numbers
-            if (number_is_available_in_row(i, x) && number_is_available_in_column(i, y) &&
+        if (number_is_available_in_row(i, x) && number_is_available_in_column(i, y) &&
             number_is_available_in_block(i, x, y)) {
             count++;
             available_number = i;
@@ -525,4 +568,5 @@ void init_game() {
             erroneous_board[i][j] = 0;
         }
     }
+    srand(time(NULL)); // setting seed for random
 }

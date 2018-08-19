@@ -351,12 +351,11 @@ void generate(int x, int y) {
 
 void num_solutions() {
     int ans;
-    //TODO: check if the GAME_MODE is either 1 or 2, otherwise invalid command error
     if(check_if_board_erroneous() == 1){
         printf("Error: board contains erroneous values\n");
         return;
     }
-    ans = exhaustive_backtracking(int , int , ); //TODO: parameters?
+    ans = exhaustive_backtracking(0, 0, game_board, 0); //TODO: correct parameters?
     printf("Number of solutions: %d\n", ans);
     if(ans == 1){
         printf("This is a good board!\n");

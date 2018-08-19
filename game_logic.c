@@ -347,17 +347,30 @@ int validate_solution() {
     }
 }
 
+void clear_board(){
+    int i;
+    int j;
+    for (i=0; i<ROWS_COLUMNS_NUM; i++){
+        for (j=0; j<ROWS_COLUMNS_NUM; j++){
+            game_board[i][j] = 0;
+            erroneous_board[i][j] = 0;
+            fixed_numbers_board[i][j] = 0;
+        }
+    }
+
+}
+
 int try_generate(int x) {
     int x_index;
     int y_index;
     int i;
-    int legal_values;
+    int *legal_values;
     int rand_value;
     for (i = 0; i < x; i++) {
         x_index = rand() % ROWS_COLUMNS_NUM;
         y_index = rand() % ROWS_COLUMNS_NUM;
         if (sizeof(legal_values) == 0) {
-            // TODO: clear the board
+            clear_board();
             return 0;
         }
         rand_value = rand() % sizeof(legal_values);
@@ -366,14 +379,11 @@ int try_generate(int x) {
     if (!solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
         return 0;
     }
+    return 1;
 }
 
 void generate(int x, int y) {
     int i;
-    int x_index;
-    int y_index;
-    int *legal_values;
-    int rand_value;
     i = 0;
     if (EMPTY_CELLS_NUM < ROWS_COLUMNS_NUM * ROWS_COLUMNS_NUM) {
         printf("Error: board is not empty\n"); // TODO: is it a space before the \n in the instructions document?

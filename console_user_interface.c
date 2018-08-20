@@ -16,19 +16,79 @@ const char *solve_commands[] = {"solve", "edit", "mark_errors", "print_board", "
 const char *init_commands[] = {"solve", "edit", NULL};
 
 
+void execute_set_cell(char **params) {
+    int set_cell_params[3];
+    int i;
+    char *next;
+    for (i = 0; i < 3; i++) {
+        set_cell_params[i] = strtol(params[i], &next, 10);
+        if (next <= params[i]) {
+            printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
+            return;
+        }
+    }
+    set_cell_params[0] = set_cell_params[0] - 1;
+    set_cell_params[1] = set_cell_params[1] - 1;
+    set_cell(set_cell_params[1], set_cell_params[0], set_cell_params[2]);
+}
+
+void execute_generate(char **params) {
+    int generate_params[2];
+    int i;
+    char *next;
+    for (i = 0; i < 2; i++) {
+        generate_params[i] = strtol(params[i], &next, 10);
+        if (next <= params[i]) {
+            printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
+            return;
+        }
+    }
+    generate(generate_params[0], generate_params[1]);
+}
+
+void execute_save_board(char **params) {
+    save_board(params[0]);
+}
+
+void execute_get_hint(char **params) {
+    int get_hint_params[2];
+    int i;
+    char *next;
+    for (i = 0; i < 2; i++) {
+        get_hint_params[i] = strtol(params[i], &next, 10);
+        if (next <= params[i]) {
+            printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
+            return;
+        }
+    }
+    get_hint(get_hint_params[0], get_hint_params[1]);
+}
+
+void execute_mark_errors(char **params) {
+    int mark_errors_param;
+    char *next;
+    mark_errors_param = strtol(params[0], &next, 10);
+    if (next <= params[0] || mark_errors_param > 1 || mark_errors_param < 0) {
+        printf("Error: the value should be 0 or 1\n");
+        return;
+    }
+    mark_errors(mark_errors_param);
+}
+
+
 int execute_command(char *command, char **params) {
     /* TODO: write documentation */
     if (strcmp(all_commands[0], command) == 0) {
-        if (params==NULL){
+        if (params == NULL) {
             printf("Error: invalid command\n");
             return 1;
             // TODO: check if this is the right treatment to solve without parameters
         }
         solve(params[0]);
     } else if (strcmp(all_commands[1], command) == 0) {
-        if (params==NULL){
+        if (params == NULL) {
             edit(NULL);
-        } else{
+        } else {
             edit(params[0]);
         }
     } else if (strcmp(all_commands[2], command) == 0) {
@@ -53,8 +113,7 @@ int execute_command(char *command, char **params) {
         execute_get_hint(params);
     } else if ((strcmp(all_commands[12], command) == 0)) {
         execute_mark_errors(params);
-    }
-    else if (strcmp(all_commands[13], command) == 0) {
+    } else if (strcmp(all_commands[13], command) == 0) {
         restart_game();
     } else if ((strcmp(all_commands[14], command) == 0)) {
         return 0;
@@ -70,7 +129,7 @@ int check_if_suitable_command(const char *commands[], char *command) {
     int i;
     i = 0;
     // TODO: should fix this strlen
-    while (commands[i]!=NULL) {
+    while (commands[i] != NULL) {
         if (strcmp(command, commands[i]) == 0) {
             return 1;
         }
@@ -94,7 +153,7 @@ void play_game() {
     }
     printf("Enter your command:\n");
     while (fgets(command_and_parameters, command_max_length, stdin) != NULL) {
-        if (strlen(command_and_parameters)==COMMAND_AND_PARAMS_SIZE){
+        if (strlen(command_and_parameters) == COMMAND_AND_PARAMS_SIZE) {
             // means that the command is too long the therefore should be considered as invalid.
             printf("ERROR: invalid command\n");
         }
@@ -104,7 +163,7 @@ void play_game() {
             // we ignore any kind of blank characters
             continue;
         }
-        if (parameters!=NULL){
+        if (parameters != NULL) {
             splitted_params = str_split(parameters, ' ');
         } else {
             splitted_params = NULL;
@@ -126,7 +185,7 @@ void play_game() {
                 continue;
             }
         }
-        if (!execute_command(command, splitted_params)){
+        if (!execute_command(command, splitted_params)) {
             // means that an exit command was given
             break;
         }
@@ -146,26 +205,26 @@ void print_board(int **board) {
     int rows_counter;
     int columns_counter;
     rows_counter = 0;
-    if(ROWS_PER_BLOCK == 0 && COLUMNS_PER_BLOCK == 0){
+    if (ROWS_PER_BLOCK == 0 && COLUMNS_PER_BLOCK == 0) {
         // means the board is empty and therefore there is nothing to print
         return;
     }
-    for (i = 0; i < (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK + 1); i++) {
+    for (i = 0; i < (ROWS_PER_BLOCK * COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK + 1); i++) {
         // ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK is overall number of rows (including separator rows)
         // ROWS_PER_BLOCK = m = number of rows of cells per block
         if ((i % (ROWS_PER_BLOCK + 1)) == 0) {
             //separator row
-            for (z = 0; z < (4*(ROWS_PER_BLOCK*COLUMNS_PER_BLOCK) + ROWS_PER_BLOCK); z++) {
+            for (z = 0; z < (4 * (ROWS_PER_BLOCK * COLUMNS_PER_BLOCK) + ROWS_PER_BLOCK); z++) {
                 printf("-");
             }
             printf("-\n");
             rows_counter++;
         } else {
             columns_counter = 0;
-            for (j = 0; j < (ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + ROWS_PER_BLOCK +1); j++) {
+            for (j = 0; j < (ROWS_PER_BLOCK * COLUMNS_PER_BLOCK + ROWS_PER_BLOCK + 1); j++) {
                 //COLUMNS_PER_BLOCK = n = number of rows of blocks
-                if ((j % (COLUMNS_PER_BLOCK+1)) == 0) {
-                    if (j == ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + ROWS_PER_BLOCK) {
+                if ((j % (COLUMNS_PER_BLOCK + 1)) == 0) {
+                    if (j == ROWS_PER_BLOCK * COLUMNS_PER_BLOCK + ROWS_PER_BLOCK) {
                         printf("|\n");
                     } else {
                         printf("|");
@@ -181,12 +240,11 @@ void print_board(int **board) {
                     if (fixed_numbers_board[i - rows_counter][j - columns_counter] == 1) {
                         /*means that this is a fixed cell*/
                         printf(".");
-                    } else if (GAME_MODE == 1 || MARK_ERRORS == 1){
-                        if (erroneous_board[i - rows_counter][j - columns_counter] == 1){
+                    } else if (GAME_MODE == 1 || MARK_ERRORS == 1) {
+                        if (erroneous_board[i - rows_counter][j - columns_counter] == 1) {
                             /*means that this is an erroneous value*/
                             printf("*");
-                        }
-                        else{
+                        } else {
                             printf(" ");
                         }
                     } else {

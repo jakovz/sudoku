@@ -1,69 +1,24 @@
 #include <stdio.h>
 #include <malloc.h>
-#include <assert.h>
-#include <mem.h>
 #include <time.h>
 #include "game_logic.h"
 #include "helper_functions.h"
 #include "ilp_solver.h"
 #include "exhaustive_backtracking_solver.h"
 
-
-void execute_set_cell(char **params) {
-    int set_cell_params[3];
+void copy_board(int **from, int **to, int save_moves) {
     int i;
-    char *next;
-    for (i = 0; i < 3; i++) {
-        set_cell_params[i] = strtol(params[i], &next, 10);
-        if (next <= params[i]) {
-            printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
-            return;
+    int j;
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            if (save_moves) {
+                if (from[i][j] != 0 && from[i][j] != to[i][j]) {
+                    set_cell(i, j, from[i][j]);
+                }
+            } else {
+                to[i][j] = from[i][j];
+            }
         }
-    }
-    set_cell_params[0] = set_cell_params[0] - 1;
-    set_cell_params[1] = set_cell_params[1] - 1;
-    set_cell(set_cell_params[1], set_cell_params[0], set_cell_params[2]);
-}
-
-void execute_generate(char **params) {
-    int generate_params[2];
-    int i;
-    char *next;
-    for (i = 0; i < 2; i++) {
-        generate_params[i] = strtol(params[i], &next, 10);
-        if (next <= params[i]) {
-            printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
-            return;
-        }
-    }
-    generate(generate_params[0], generate_params[1]);
-}
-
-void execute_save_board(char **params) {
-    save_board(params[0]);
-}
-
-void execute_get_hint(char **params) {
-    int get_hint_params[2];
-    int i;
-    char *next;
-    for (i = 0; i < 2; i++) {
-        get_hint_params[i] = strtol(params[i], &next, 10);
-        if (next <= params[i]) {
-            printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
-            return;
-        }
-    }
-    get_hint(get_hint_params[0], get_hint_params[1]);
-}
-
-void execute_mark_errors(char **params) {
-    int mark_errors_param;
-    char *next;
-    mark_errors_param = strtol(params[0], &next, 10);
-    if (next <= params[0] || mark_errors_param > 1) {
-        printf("Error: the value should be 0 or 1\n");
-        return;
     }
 }
 
@@ -319,14 +274,11 @@ void get_hint(int x, int y) {
 int check_if_board_erroneous() {
     int i;
     int j;
-    int x;
-    int y;
     int number;
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
             number = game_board[i][j];
-            if (!(number_does_not_exist_in_row(number, x) && number_does_not_exist_in_column(number, y) &&
-                  number_does_not_exist_in_block(number, x, y))) {
+            if (!number_is_available(game_board, number, i, j, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
                 return 1;
             }
         }
@@ -347,34 +299,69 @@ int validate_solution() {
     }
 }
 
+void clear_game_boards() {
+    int i;
+    int j;
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            game_board[i][j] = 0;
+            erroneous_board[i][j] = 0;
+            fixed_numbers_board[i][j] = 0;
+        }
+    }
+
+}
+
 int try_generate(int x) {
     int x_index;
     int y_index;
     int i;
-    int legal_values;
+    int j;
+    int count;
+    int *legal_values;
     int rand_value;
+    count = 0;
+    legal_values = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
     for (i = 0; i < x; i++) {
         x_index = rand() % ROWS_COLUMNS_NUM;
         y_index = rand() % ROWS_COLUMNS_NUM;
-        if (sizeof(legal_values) == 0) {
-            // TODO: clear the board
+        get_available_numbers_for_set(legal_values, x_index, y_index, game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK,
+                                      COLUMNS_PER_BLOCK);
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            if (legal_values[j] > 0) {
+                count++;
+            }
+        }
+        if (count == 0) {
+            clear_game_boards();
             return 0;
         }
-        rand_value = rand() % sizeof(legal_values);
-        game_board[x_index][y_index] = rand_value;
+        rand_value = rand() % count;
+        j = 0;
+        while (rand_value > 0) {
+            if (legal_values[i] == 0) {
+                count--;
+            }
+            j++;
+        }
+        game_board[x_index][y_index] = legal_values[j];
     }
+    free(legal_values);
     if (!solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
         return 0;
     }
+    return 1;
 }
 
 void generate(int x, int y) {
     int i;
     int x_index;
     int y_index;
-    int *legal_values;
-    int rand_value;
-    i = 0;
+    int **tmp_board;
+    tmp_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        tmp_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+    }
     if (EMPTY_CELLS_NUM < ROWS_COLUMNS_NUM * ROWS_COLUMNS_NUM) {
         printf("Error: board is not empty\n"); // TODO: is it a space before the \n in the instructions document?
         return;
@@ -383,124 +370,40 @@ void generate(int x, int y) {
         printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
         return;
     }
+    i = 0;
     while (!try_generate(x) && i < 1000) {
         i++;
     }
-    if (i>=1000){
+    if (i >= 1000) {
         printf("Error: puzzle generator failed\n");
         return;
     }
     // if the program got here, it means that the board was generated successfully
+    copy_board(solved_board, tmp_board, 0);
+    for (i = 0; i < y; i++) {
+        x_index = rand() % ROWS_COLUMNS_NUM;
+        y_index = rand() % ROWS_COLUMNS_NUM;
+        tmp_board[x_index][y_index] = 0;
+    }
+    copy_board(tmp_board, game_board, 1);
 }
 
 void num_solutions() {
     int ans;
-    if(check_if_board_erroneous() == 1){
+    if (check_if_board_erroneous() == 1) {
         printf("Error: board contains erroneous values\n");
         return;
     }
-    ans = exhaustive_backtracking(0, 0, game_board, 0); //TODO: correct parameters?
+    ans = exhaustive_backtracking(0, 0, game_board, 0, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK,
+                                  COLUMNS_PER_BLOCK); //TODO: correct parameters?
     printf("Number of solutions: %d\n", ans);
-    if(ans == 1){
+    if (ans == 1) {
         printf("This is a good board!\n");
-    }
-    else{
+    } else {
         printf("The puzzle has more than 1 solution, try to edit it further\n");
     }
 }
 
-void copy_board(int **from, int **to, int save_moves) {
-    int i;
-    int j;
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
-            if (save_moves) {
-                if (from[i][j] != 0 && from[i][j] != to[i][j]) {
-                    set_cell(i, j, from[i][j]);
-                }
-            } else {
-                to[i][j] = from[i][j];
-            }
-        }
-    }
-}
-
-int number_does_not_exist_in_row(int number, int row) {
-    int i;
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        if (game_board[row][i] == number) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-int number_does_not_exist_in_column(int number, int column) {
-    int i;
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        if (game_board[i][column] == number) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-int number_does_not_exist_in_block(int number, int row, int column) {
-    int i;
-    int j;
-    int row_lower_bound;
-    int row_upper_bound;
-    int column_lower_bound;
-    int column_upper_bound;
-    row_lower_bound = (row / ROWS_PER_BLOCK);
-    row_upper_bound = row_lower_bound + ROWS_PER_BLOCK;
-    column_lower_bound = (column / COLUMNS_PER_BLOCK);
-    column_upper_bound = column_lower_bound + COLUMNS_PER_BLOCK;
-    for (i = row_lower_bound; i < row_upper_bound; i++) {
-        for (j = column_lower_bound; j < column_upper_bound; j++) {
-            if (game_board[i][j] == number) {
-                return 0;
-            }
-        }
-    }
-    return 1;
-}
-
-void get_available_numbers_for_set(int available_numbers[ROWS_COLUMNS_NUM], int rows_index, int columns_index,
-                                   int new_solved_board[ROWS_COLUMNS_NUM][ROWS_COLUMNS_NUM]) {
-    int i;
-    int j;
-    int block_first_row;
-    int block_first_column;
-    int block_last_row;
-    int block_last_column;
-    /* first we check for the row*/
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        if (new_solved_board[rows_index][i] != 0) {
-            if (new_solved_board[rows_index][i] != 0) {
-                available_numbers[new_solved_board[rows_index][i] - 1]++;
-            }
-        }
-    }
-    /* then we check the column*/
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        if (new_solved_board[i][columns_index] != 0) {
-            available_numbers[new_solved_board[i][columns_index] - 1]++;
-        }
-    }
-    /* and last we check the block*/
-    block_first_row = rows_index - rows_index % ROWS_PER_BLOCK;
-    block_last_row = block_first_row + ROWS_PER_BLOCK;
-    block_first_column = columns_index - columns_index % COLUMNS_PER_BLOCK;
-    block_last_column = block_first_column + COLUMNS_PER_BLOCK;
-    for (i = block_first_row; i < block_last_row; i++) {
-        for (j = block_first_column; j < block_last_column; j++) {
-            if (new_solved_board[i][j] != 0 && rows_index != i && columns_index != j) {
-                available_numbers[new_solved_board[i][j] - 1]++;
-            }
-        }
-    }
-}
 
 int get_autofill_value(int x, int y) {
     int i;
@@ -509,8 +412,7 @@ int get_autofill_value(int x, int y) {
     count = 0;
     for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
         // iterating all possible numbers
-        if (number_does_not_exist_in_row(i, x) && number_does_not_exist_in_column(i, y) &&
-            number_does_not_exist_in_block(i, x, y)) {
+        if (number_is_available(game_board, i, x, y, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
             count++;
             available_number = i;
         }
@@ -564,7 +466,7 @@ void autofill() {
 }
 
 void clear_moves_list_from_first() {
-    // this function assumes game_moves have no prev value (the current move is the first move in the list)
+    // this function assumes game_moves has no prev value (the current move is the first move in the list)
     struct game_move *current;
     while ((*game_moves).next != NULL) {
         current = game_moves;

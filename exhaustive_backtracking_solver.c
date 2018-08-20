@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
 #include "exhaustive_backtracking_solver.h"
 #include "game_logic.h"
 
@@ -9,6 +12,25 @@ int exhaustive_backtracking(int rows_index, int columns_index, int new_solved_bo
     int i;
     int j;
     int p;
+
+    /*TODO: credit to https://www.geeksforgeeks.org/stack-data-structure-introduction-program/*/
+    struct StackNode {
+        int rows_index;
+        int columns_index;
+        int new_solved_board[ROWS_COLUMNS_NUM][ROWS_COLUMNS_NUM];
+        int current;
+        struct StackNode* next;
+    };
+    struct StackNode* newNode(int rows_index, int columns_index, int new_solved_board[ROWS_COLUMNS_NUM][ROWS_COLUMNS_NUM], int current) {
+        struct StackNode* stackNode = (struct StackNode*) malloc(sizeof(struct StackNode));
+        stackNode->rows_index = rows_index;
+        stackNode->columns_index = columns_index;
+        stackNode->new_solved_board[ROWS_COLUMNS_NUM][ROWS_COLUMNS_NUM] = new_solved_board[ROWS_COLUMNS_NUM][ROWS_COLUMNS_NUM];
+        stackNode->current = current;
+        stackNode->next = NULL;
+        return stackNode;
+    }
+
     counter = 0;
     num_of_solutions = 0;
 

@@ -31,8 +31,6 @@ void execute_get_hint(char **params);
 void execute_mark_errors(char **params);
 void exit_game();
 void restart_game();
-void get_available_numbers_for_set(int available_numbers[ROWS_COLUMNS_NUM], int rows_index, int columns_index,
-                                   int new_solved_board[ROWS_COLUMNS_NUM][ROWS_COLUMNS_NUM])
 void autofill();
 void num_solutions();
 void generate(int x, int y);

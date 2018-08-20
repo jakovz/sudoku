@@ -9,4 +9,5 @@
 
 int ROWS_COLUMNS_NUM;
 
-int exhaustive_backtracking(int rows_index, int columns_index, int new_solved_board[ROWS_COLUMNS_NUM][ROWS_COLUMNS_NUM], int current)
+int exhaustive_backtracking(int rows_index, int columns_index, int **new_solved_board, int current, int rows_columns_num,
+                            int rows_per_block, int columns_per_block);

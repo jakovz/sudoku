@@ -3,7 +3,8 @@
 #include <string.h>
 #include "gurobi_c.h"
 
-void create_empty_model(int **game_board, double *lb, char *vtype, char **names, char *namestorage, char *cursor, int rows_columns) {
+void create_empty_model(int **game_board, double *lb, char *vtype, char **names, char *namestorage, char *cursor,
+                        int rows_columns) {
     int i;
     int j;
     int v;
@@ -101,7 +102,8 @@ create_appear_once_in_block_constrains(GRBmodel *model, int *ind, double *val, i
     return error;
 }
 
-void allocate_ilp_variables(int **ind, double **val, double **lb, char **vtype, char ***names, char **namestorage, int rows_columns) {
+void allocate_ilp_variables(int **ind, double **val, double **lb, char **vtype, char ***names, char **namestorage,
+                            int rows_columns) {
     (*ind) = (int *) malloc(rows_columns * sizeof(int));
     (*val) = (double *) malloc(rows_columns * sizeof(double));
     (*lb) = (double *) malloc(rows_columns * rows_columns * rows_columns * sizeof(double));
@@ -151,7 +153,8 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
     if (error) goto QUIT;
     error = create_single_value_per_cell_constraints(model, ind, val, error, rows_columns); // Each cell gets a value
     if (error) goto QUIT;
-    error = create_appear_once_in_row_constrains(game_board, model, ind, val, error, rows_columns); // Each value must appear once in each row
+    error = create_appear_once_in_row_constrains(model, ind, val, error,
+                                                 rows_columns); // Each value must appear once in each row
     if (error) goto QUIT;
 
     // Each value must appear once in each column
@@ -159,7 +162,8 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
     if (error) goto QUIT;
 
     // Each value must appear once in each block
-    error = create_appear_once_in_block_constrains(model, ind, val, count, error, rows_columns, rows_per_block, columns_per_block);
+    error = create_appear_once_in_block_constrains(model, ind, val, count, error, rows_columns, rows_per_block,
+                                                   columns_per_block);
     if (error) goto QUIT;
 
     error = GRBoptimize(model); // optimizing model

@@ -290,7 +290,7 @@ int validate_solution() {
     if (check_if_board_erroneous()) {
         printf("Validation failed: board is unsolvable\n");
         return 0;
-    } else if (solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
+    } else if (solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, 1, solved_board)) {
         printf("Validation passed: board is solvable\n");
         return 1;
     } else {

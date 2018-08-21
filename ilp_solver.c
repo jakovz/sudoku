@@ -124,7 +124,8 @@ void free_ilp_variables(int *ind, double *val, double *lb, char *vtype, char **n
     free(namestorage);
 }
 
-int solve_board(int **game_board, int rows_columns, int rows_per_block, int columns_per_block) {
+int solve_board(int **game_board, int rows_columns, int rows_per_block, int columns_per_block,
+                int fill_solved_board_with_solution, int **solved_board) {
     GRBenv *env;
     GRBmodel *model;
     int *ind;
@@ -139,6 +140,10 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
     int count;
     int error;
     int result;
+    double *results;
+    int i;
+    int j;
+    int v;
     error = 0;
     count = 0;
     result = 0;
@@ -190,6 +195,24 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
         result = 0;
     }
     printf("\n");
+
+    results = (double *) malloc(sizeof(int) * rows_columns);
+    if (results == NULL) goto QUIT;
+
+    error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, rows_columns * rows_columns * rows_columns, results);
+    if (error) goto QUIT;
+
+    if (fill_solved_board_with_solution){
+        for (i=0; i<rows_columns; i++){
+            for (j=0; j<rows_columns; j++)
+            {
+                for (v=0; v<rows_columns; v++){
+                    solved_board[i][j] = results[i * rows_columns * rows_columns + j * rows_columns + v];
+                }
+            }
+        }
+    }
+
 
     QUIT:
     if (error) {

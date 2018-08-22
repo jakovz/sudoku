@@ -1,5 +1,5 @@
+#include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
 #include <time.h>
 #include "game_logic.h"
 #include "helper_functions.h"
@@ -23,7 +23,7 @@ void copy_board(int **from, int **to, int save_moves) {
 }
 
 void solve(char *path) {
-    // loads the board from file
+    /* loads the board from file */
     FILE *fp;
     int i;
     int j;
@@ -64,12 +64,12 @@ void edit(char *path) {
     int c;
     GAME_MODE = 1; /*Edit mode*/
     if (path == NULL) {
-        //create an empty 9x9 board
+        /* create an empty 9x9 board */
         ROWS_PER_BLOCK = 3;
         COLUMNS_PER_BLOCK = 3;
         init_game();
     } else {
-        // loads the board from a file
+        /* loads the board from a file */
         fp = fopen(path, "r");
         if (fp == NULL) {
             printf("Error: File doesn't exist or cannot be opened\n");
@@ -118,7 +118,7 @@ void free_next_moves() {
 void update_moves_list(int x, int y, int z, int old) {
     struct game_move *last_move;
     if (game_moves == NULL) {
-        // initializing moves list
+        /* initializing moves list */
         game_moves = (struct game_move *) malloc(sizeof(struct game_move));
         (*game_moves).prev = NULL;
         (*game_moves).next = NULL;
@@ -217,7 +217,6 @@ void redo() {
 
 void save_board(char *path) {
     FILE *fp;
-    char *size_to_write;
     int i;
     int j;
     /*save is only available in Edit and Solve modes*/
@@ -268,7 +267,8 @@ void save_board(char *path) {
 }
 
 void get_hint(int x, int y) {
-
+    x = x + 1;
+    y = y + 1;
 }
 
 int check_if_board_erroneous() {
@@ -278,7 +278,8 @@ int check_if_board_erroneous() {
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
             number = game_board[i][j];
-            if (!number_is_available(game_board, number, i, j, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
+            if (number != 0 && !number_is_available(game_board, number, i, j, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
+                printf("number is %d, i:%d, j:%d\n", number, i, j);
                 return 1;
             }
         }
@@ -288,7 +289,7 @@ int check_if_board_erroneous() {
 
 int validate_solution() {
     if (check_if_board_erroneous()) {
-        printf("Validation failed: board is unsolvable\n");
+        printf("Error: board contains erroneous values\n");
         return 0;
     } else if (solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, 1, solved_board)) {
         printf("Validation passed: board is solvable\n");
@@ -347,7 +348,7 @@ int try_generate(int x) {
         game_board[x_index][y_index] = legal_values[j];
     }
     free(legal_values);
-    if (!solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
+    if (!solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, 1, solved_board)) {
         return 0;
     }
     return 1;
@@ -363,10 +364,10 @@ void generate(int x, int y) {
         tmp_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
     }
     if (EMPTY_CELLS_NUM < ROWS_COLUMNS_NUM * ROWS_COLUMNS_NUM) {
-        printf("Error: board is not empty\n"); // TODO: is it a space before the \n in the instructions document?
+        printf("Error: board is not empty\n");
         return;
     }
-    if (x > EMPTY_CELLS_NUM) {
+    if (x > EMPTY_CELLS_NUM || y > EMPTY_CELLS_NUM) {
         printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
         return;
     }
@@ -378,7 +379,7 @@ void generate(int x, int y) {
         printf("Error: puzzle generator failed\n");
         return;
     }
-    // if the program got here, it means that the board was generated successfully
+    /* if the program got here, it means that the board was generated successfully */
     copy_board(solved_board, tmp_board, 0);
     for (i = 0; i < y; i++) {
         x_index = rand() % ROWS_COLUMNS_NUM;
@@ -395,7 +396,7 @@ void num_solutions() {
         return;
     }
     ans = exhaustive_backtracking(0, 0, game_board, 0, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK,
-                                  COLUMNS_PER_BLOCK); //TODO: correct parameters?
+                                  COLUMNS_PER_BLOCK); /* TODO: correct parameters? */
     printf("Number of solutions: %d\n", ans);
     if (ans == 1) {
         printf("This is a good board!\n");
@@ -408,18 +409,18 @@ void num_solutions() {
 int get_autofill_value(int x, int y) {
     int i;
     int available_number;
-    int count; // counts the number of available numbers that can be filled in the empty cell.
+    int count; /*  counts the number of available numbers that can be filled in the empty cell. */
     count = 0;
     for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
-        // iterating all possible numbers
-        if (number_is_available(game_board, i, x, y, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
+        /* iterating all possible numbers */
+        if (number_is_available(game_board, i, x, y, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
             count++;
             available_number = i;
         }
     }
     if (count > 1 || count == 0) {
         return 0;
-    } else if (count == 1) {
+    } else {
         return available_number;
     }
 }
@@ -450,10 +451,10 @@ void autofill() {
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
             if (game_board[i][j] == 0) {
-                // we are going to check if a cell has an obvious value only if the cell is empty
+                /* we are going to check if a cell has an obvious value only if the cell is empty */
                 if ((new_value = get_autofill_value(i, j)) > 0) {
-                    // means that there is an autofill option
-                    filled_board[i][j] = new_value; // we do not want the new values to affect autofill.
+                    /* means that there is an autofill option */
+                    filled_board[i][j] = new_value; /* we do not want the new values to affect autofill. */
                 }
             }
         }
@@ -466,7 +467,7 @@ void autofill() {
 }
 
 void clear_moves_list_from_first() {
-    // this function assumes game_moves has no prev value (the current move is the first move in the list)
+    /* this function assumes game_moves has no prev value (the current move is the first move in the list) */
     struct game_move *current;
     while ((*game_moves).next != NULL) {
         current = game_moves;
@@ -489,7 +490,7 @@ void exit_game() {
         game_moves = (*game_moves).prev;
     }
     free_next_moves();
-    // TODO: check what else should be freed here
+    /* TODO: check what else should be freed here */
 }
 
 void init_game() {
@@ -497,19 +498,22 @@ void init_game() {
     int j;
     ROWS_COLUMNS_NUM = ROWS_PER_BLOCK * COLUMNS_PER_BLOCK;
     EMPTY_CELLS_NUM = ROWS_COLUMNS_NUM * ROWS_COLUMNS_NUM;
-    game_board = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
-    erroneous_board = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
-    fixed_numbers_board = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
-    if (game_board == NULL || erroneous_board == NULL || fixed_numbers_board == NULL) {
-        printf("Error: game initialization failed\n"); // TODO: validate that this is the message that should be printed
+    game_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
+    erroneous_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
+    fixed_numbers_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
+    solved_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
+    if (game_board == NULL || erroneous_board == NULL || fixed_numbers_board == NULL || solved_board == NULL) {
+        printf("Error: game initialization failed\n"); /* TODO: validate that this is the message that should be printed */
         return;
     }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         game_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         fixed_numbers_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         erroneous_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
-        if (game_board[i] == NULL || erroneous_board[i] == NULL || fixed_numbers_board[i] == NULL) {
-            printf("Error: game initialization failed\n"); // TODO: validate that this is the message that should be printed
+        solved_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+        if (game_board[i] == NULL || erroneous_board[i] == NULL || fixed_numbers_board[i] == NULL ||
+            solved_board[i] == NULL) {
+            printf("Error: game initialization failed\n"); /* TODO: validate that this is the message that should be printed */
             return;
         }
     }
@@ -518,7 +522,8 @@ void init_game() {
             game_board[i][j] = 0;
             fixed_numbers_board[i][j] = 0;
             erroneous_board[i][j] = 0;
+            solved_board[i][j] = 0;
         }
     }
-    srand(time(NULL)); // setting seed for random
+    srand(time(NULL)); /* setting seed for random */
 }

@@ -26,7 +26,7 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **new_solved_
         }
             /* if this is the last cell and its value is already set*/
         else if (((rows_index + 1) == rows_columns_num) && ((columns_index + 1) == rows_columns_num)) {
-            //return 0; //TODO: doesn't finish when the last cell is filled
+            /* return 0; TODO: doesn't finish when the last cell is filled */
             num_of_solutions++;
 
 
@@ -58,52 +58,53 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **new_solved_
     /* call the function with the next indexes.*/
     if ((columns_index + 1) < rows_columns_num) {
         if (exhaustive_backtracking(rows_index, columns_index + 1, new_solved_board, 0, rows_columns_num, rows_per_block, columns_per_block) ==
-            1) { //TODO: stackkk instead of recursion
+            1) { /* TODO: stackkk instead of recursion */
             for (i = rows_index; i < rows_columns_num; i++) {
                 if (i == rows_index) {
                     for (j = columns_index; j < rows_columns_num; j++) {
-                        if (current_indicators_board[i][j] == 0) {
-                            new_solved_board[i][j] = 0;
-                        }
+                        /* if (current_indicators_board[i][j] == 0) {
+                        //    new_solved_board[i][j] = 0;
+                        } */
                     }
                 } else {
                     for (j = 0; j < rows_columns_num; j++) {
-                        if (current_indicators_board[i][j] == 0) {
-                            new_solved_board[i][j] = 0;
-                        }
+                        /* if (current_indicators_board[i][j] == 0) {
+                        //    new_solved_board[i][j] = 0;
+                        } */
                     }
                 }
             }
             current = p + 1;
             return exhaustive_backtracking(rows_index, columns_index, new_solved_board,
                                            current, rows_columns_num, rows_per_block,
-                                           columns_per_block); //TODO: stackkk instead of recursion
+                                           columns_per_block); /* TODO: stackkk instead of recursion */
         }
     } else if ((rows_index + 1) < rows_columns_num) {
         if (exhaustive_backtracking(rows_index + 1, 0, new_solved_board, 0, rows_columns_num, rows_per_block,
-                                    columns_per_block) == 1) { //TODO: stackkk instead of recursion
+                                    columns_per_block) == 1) { /* TODO: stackkk instead of recursion */
             for (i = rows_index; i < rows_columns_num; i++) {
                 if (i == rows_index) {
                     for (j = columns_index; j < rows_columns_num; j++) {
-                        if (current_indicators_board[i][j] == 0) {
+                        /*if (current_indicators_board[i][j] == 0) {
                             new_solved_board[i][j] = 0;
-                        }
+                        }*/
                     }
                 } else {
                     for (j = 0; j < rows_columns_num; j++) {
-                        if (current_indicators_board[i][j] == 0) {
+                        /*if (current_indicators_board[i][j] == 0) {
                             new_solved_board[i][j] = 0;
-                        }
+                        }*/
                     }
                 }
             }
             current = p + 1;
             return exhaustive_backtracking(rows_index, columns_index, new_solved_board,
                                            current, rows_columns_num, rows_per_block,
-                                           columns_per_block); //TODO: stackkk instead of recursion
+                                           columns_per_block); /*TODO: stackkk instead of recursion*/
         }
     }
     /*the last cell was successfully assigned the value p+1*/
     num_of_solutions++;
-    //return 0; //TODO: doesn't finish when the last cell is filled
+    /* return 0; TODO: doesn't finish when the last cell is filled */
+    return 0;
 }

@@ -1,9 +1,20 @@
-#include <mem.h>
+#include <stdio.h>
+#include <string.h>
 #include <assert.h>
 #include <malloc.h>
+#include "helper_functions.h"
 
-// Credit: https://stackoverflow.com/questions/9210528/split-string-with-delimiters-in-c
-// TODO: validate that credit is needed
+char *strdup(const char *s) {
+    size_t size = strlen(s) + 1;
+    char *p = malloc(size);
+    if (p) {
+        memcpy(p, s, size);
+    }
+    return p;
+}
+
+/* Credit: https://stackoverflow.com/questions/9210528/split-string-with-delimiters-in-c */
+/* TODO: validate that credit is needed */
 char **str_split(char *a_str, const char a_delim) {
     char **result = 0;
     size_t count = 0;
@@ -84,27 +95,27 @@ void get_available_numbers_for_set(int *available_numbers, int rows_index, int c
     }
 }
 
-int number_does_not_exist_in_row(int **game_board, int number, int row, int rows_columns_num) {
+int number_does_not_exist_in_row(int **game_board, int number, int row, int column, int rows_columns_num) {
     int i;
     for (i = 0; i < rows_columns_num; i++) {
-        if (game_board[row][i] == number) {
+        if (game_board[row][i] == number && i!=column) {
             return 0;
         }
     }
     return 1;
 }
 
-int number_does_not_exist_in_column(int **game_board, int number, int column, int rows_columns_num) {
+int number_does_not_exist_in_column(int **game_board, int number, int row, int column, int rows_columns_num) {
     int i;
     for (i = 0; i < rows_columns_num; i++) {
-        if (game_board[i][column] == number) {
+        if (game_board[i][column] == number && i!=row) {
             return 0;
         }
     }
     return 1;
 }
 
-int number_does_not_exist_in_block(int **game_board, int number, int row, int column, int rows_columns_num, int rows_per_block, int columns_per_block) {
+int number_does_not_exist_in_block(int **game_board, int number, int row, int column, int rows_per_block, int columns_per_block) {
     int i;
     int j;
     int row_lower_bound;
@@ -117,7 +128,7 @@ int number_does_not_exist_in_block(int **game_board, int number, int row, int co
     column_upper_bound = column_lower_bound + columns_per_block;
     for (i = row_lower_bound; i < row_upper_bound; i++) {
         for (j = column_lower_bound; j < column_upper_bound; j++) {
-            if (game_board[i][j] == number) {
+            if (game_board[i][j] == number && i!=row && j!=column) {
                 return 0;
             }
         }
@@ -125,9 +136,9 @@ int number_does_not_exist_in_block(int **game_board, int number, int row, int co
     return 1;
 }
 
-int number_is_available(int **game_board, int number, int row, int column, int rows_columns_num, int rows_per_block, int columns_per_block){
-    if (number_does_not_exist_in_row(game_board, number, row, rows_per_block) && number_does_not_exist_in_column(game_board, number, column, rows_per_block) &&
-        number_does_not_exist_in_block(game_board, number, row, column, rows_columns_num, rows_per_block, columns_per_block)){
+int number_is_available(int **game_board, int number, int row, int column, int rows_per_block, int columns_per_block){
+    if (number_does_not_exist_in_row(game_board, number, row, column, rows_per_block) && number_does_not_exist_in_column(game_board, number, row, column, rows_per_block) &&
+        number_does_not_exist_in_block(game_board, number, row, column, rows_per_block, columns_per_block)){
         return 1;
     }
     return 0;

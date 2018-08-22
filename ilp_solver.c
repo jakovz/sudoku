@@ -1,27 +1,25 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "ilp_solver.h"
 #include "gurobi_c.h"
 
-void create_empty_model(int **game_board, double *lb, char *vtype, char **names, char *namestorage, char *cursor,
-                        int rows_columns) {
+void create_empty_model(int **game_board, double *lb, char *vtype, int rows_columns) {
     int i;
     int j;
     int v;
-    cursor = namestorage;
     for (i = 0; i < rows_columns; i++) {
         for (j = 0; j < rows_columns; j++) {
             for (v = 0; v < rows_columns; v++) {
-                if (game_board[i][j] == v)
+                if ((game_board[i][j] - 1) == v)
+                    /* we may look at the 3D matrix in the following way:
+                     * matrix i represents all possible values for row i in the original game board while
+                     * matrix[i,j] is a boolean array of size rows_columns represents all possible values for game_board[i,j].
+                     * */
                     lb[i * rows_columns * rows_columns + j * rows_columns + v] = 1;
                 else
                     lb[i * rows_columns * rows_columns + j * rows_columns + v] = 0;
                 vtype[i * rows_columns * rows_columns + j * rows_columns + v] = GRB_BINARY;
-
-                names[i * rows_columns * rows_columns + j * rows_columns + v] = cursor;
-                sprintf(names[i * rows_columns * rows_columns + j * rows_columns + v], "x[%d,%d,%d]", i, j,
-                        v + 1);
-                cursor += strlen(names[i * rows_columns * rows_columns + j * rows_columns + v]) + 1;
             }
         }
     }
@@ -94,7 +92,6 @@ create_appear_once_in_block_constrains(GRBmodel *model, int *ind, double *val, i
                         count++;
                     }
                 }
-
                 error = GRBaddconstr(model, rows_columns, ind, val, GRB_EQUAL, 1.0, NULL);
             }
         }
@@ -102,26 +99,19 @@ create_appear_once_in_block_constrains(GRBmodel *model, int *ind, double *val, i
     return error;
 }
 
-void allocate_ilp_variables(int **ind, double **val, double **lb, char **vtype, char ***names, char **namestorage,
-                            int rows_columns) {
+void allocate_ilp_variables(int **ind, double **val, double **lb, char **vtype, int rows_columns) {
     (*ind) = (int *) malloc(rows_columns * sizeof(int));
     (*val) = (double *) malloc(rows_columns * sizeof(double));
     (*lb) = (double *) malloc(rows_columns * rows_columns * rows_columns * sizeof(double));
     (*vtype) = (char *) malloc(rows_columns * rows_columns * rows_columns * sizeof(char));
-    (*names) = (char **) malloc(rows_columns * rows_columns * rows_columns * sizeof(char *));
-    (*namestorage) = (char *) malloc(rows_columns * rows_columns * rows_columns * 10 * sizeof(char)); // TODO: why 10?
-
 }
 
 
-void free_ilp_variables(int *ind, double *val, double *lb, char *vtype, char **names,
-                        char *namestorage) {
-    free(ind);
-    free(val);
-    free(lb);
-    free(vtype);
-    free(names);
-    free(namestorage);
+void free_ilp_variables(int **ind, double **val, double **lb, char **vtype) {
+    free(*ind);
+    free(*val);
+    free(*lb);
+    free(*vtype);
 }
 
 int solve_board(int **game_board, int rows_columns, int rows_per_block, int columns_per_block,
@@ -132,11 +122,7 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
     double *val;
     double *lb;
     char *vtype;
-    char **names;
-    char *namestorage;
-    char *cursor;
     int optimstatus;
-    double objval;
     int count;
     int error;
     int result;
@@ -149,50 +135,48 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
     result = 0;
     env = NULL;
     model = NULL;
-    allocate_ilp_variables(&ind, &val, &lb, &vtype, &names, &namestorage, rows_columns);
-    create_empty_model(game_board, lb, vtype, names, namestorage, cursor, rows_columns); // creating an empty model
-    error = GRBloadenv(&env, "sudoku.log"); // creating an environment
-    if (error) goto QUIT;
-    error = GRBnewmodel(env, &model, "sudoku", rows_columns * rows_columns * rows_columns, NULL, lb, NULL,
-                        vtype, names); // creating a new model
-    if (error) goto QUIT;
-    error = create_single_value_per_cell_constraints(model, ind, val, error, rows_columns); // Each cell gets a value
-    if (error) goto QUIT;
-    error = create_appear_once_in_row_constrains(model, ind, val, error,
-                                                 rows_columns); // Each value must appear once in each row
+    allocate_ilp_variables(&ind, &val, &lb, &vtype, rows_columns);
+    create_empty_model(game_board, lb, vtype, rows_columns); /* creating an empty model */
+    error = GRBloadenv(&env, NULL); /* creating an environment */
     if (error) goto QUIT;
 
-    // Each value must appear once in each column
+    error = GRBsetintparam(env, GRB_INT_PAR_OUTPUTFLAG, 0); /* for us to not see gurobi output messages */
+    if (error) goto QUIT;
+
+    error = GRBnewmodel(env, &model, "sudoku", rows_columns * rows_columns * rows_columns, NULL, lb, NULL, vtype,
+                        NULL); /* creating a new model */
+    if (error) goto QUIT;
+
+    error = create_single_value_per_cell_constraints(model, ind, val, error, rows_columns); /* Each cell gets a value */
+    if (error) goto QUIT;
+    error = create_appear_once_in_row_constrains(model, ind, val, error,
+                                                 rows_columns); /* Each value must appear once in each row */
+    if (error) goto QUIT;
+
+    /* Each value must appear once in each column */
     error = create_appear_once_in_column_constrains(model, ind, val, error, rows_columns);
     if (error) goto QUIT;
 
-    // Each value must appear once in each block
+    /* Each value must appear once in each block */
     error = create_appear_once_in_block_constrains(model, ind, val, count, error, rows_columns, rows_per_block,
                                                    columns_per_block);
     if (error) goto QUIT;
 
-    error = GRBoptimize(model); // optimizing model
+    error = GRBoptimize(model); /* optimizing model */
     if (error) goto QUIT;
 
-    error = GRBwrite(model, "sudoku.lp"); // TODO: check what should i do with the solution
+    error = GRBwrite(model, "sudoku.lp");
     if (error) goto QUIT;
 
-    // Capture solution information
+    /* Capture solution information */
     error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
     if (error) goto QUIT;
 
-    error = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, &objval);
-    if (error) goto QUIT;
-
     if (optimstatus == GRB_OPTIMAL) {
-        printf("Optimal objective: %.4e\n", objval); // TODO: check if i need to change this print message
-        result = 1; // success
-    } else if (optimstatus == GRB_INF_OR_UNBD) {
-        printf("Model is infeasible or unbounded\n"); // TODO: check if i need to change this print message
-        result = 0;
+        result = 1; /* success */
     } else {
-        printf("Optimization was stopped early\n"); // TODO: check if i need to change this print message
         result = 0;
+        goto QUIT;
     }
     printf("\n");
 
@@ -202,26 +186,26 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
     error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, rows_columns * rows_columns * rows_columns, results);
     if (error) goto QUIT;
 
-    if (fill_solved_board_with_solution){
-        for (i=0; i<rows_columns; i++){
-            for (j=0; j<rows_columns; j++)
-            {
-                for (v=0; v<rows_columns; v++){
-                    solved_board[i][j] = results[i * rows_columns * rows_columns + j * rows_columns + v];
+    if (fill_solved_board_with_solution) {
+        for (i = 0; i < rows_columns; i++) {
+            for (j = 0; j < rows_columns; j++) {
+                for (v = 0; v < rows_columns; v++) {
+                    if ((int) results[i * rows_columns * rows_columns + j * rows_columns + v] == 1) {
+                        solved_board[i][j] = v + 1;
+                    }
                 }
             }
         }
     }
 
-
     QUIT:
     if (error) {
-        printf("ERROR: %s\n", GRBgeterrormsg(env)); // reporting the error
+        printf("ERROR: %s\n", GRBgeterrormsg(env)); /* reporting the error */
         return 0;
     }
-    free_ilp_variables(ind, val, lb, vtype, names, namestorage);
-    GRBfreemodel(model); // free model
-    GRBfreeenv(env); // free environment
+    free_ilp_variables(&ind, &val, &lb, &vtype);
+    /* GRBfreemodel(model);  free model TODO: fix */
+   /*  GRBfreeenv(env); free environment */
     return result;
 }
 

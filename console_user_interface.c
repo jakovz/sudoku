@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <mem.h>
+#include <string.h>
 #include "console_user_interface.h"
 #include "game_logic.h"
 #include "helper_functions.h"
@@ -82,7 +82,7 @@ int execute_command(char *command, char **params) {
         if (params == NULL) {
             printf("Error: invalid command\n");
             return 1;
-            // TODO: check if this is the right treatment to solve without parameters
+            /* TODO: check if this is the right treatment to solve without parameters */
         }
         solve(params[0]);
     } else if (strcmp(all_commands[1], command) == 0) {
@@ -97,6 +97,7 @@ int execute_command(char *command, char **params) {
         execute_set_cell(params);
     } else if ((strcmp(all_commands[4], command) == 0)) {
         validate_solution();
+        print_board(solved_board);
     } else if ((strcmp(all_commands[5], command) == 0)) {
         execute_generate(params);
     } else if ((strcmp(all_commands[6], command) == 0)) {
@@ -118,7 +119,7 @@ int execute_command(char *command, char **params) {
     } else if ((strcmp(all_commands[14], command) == 0)) {
         return 0;
     } else {
-        // TODO: check what else might cause an invalid command
+        /* TODO: check what else might cause an invalid command */
         printf("Error: invalid command\n");
     }
     return 1;
@@ -128,7 +129,7 @@ int execute_command(char *command, char **params) {
 int check_if_suitable_command(const char *commands[], char *command) {
     int i;
     i = 0;
-    // TODO: should fix this strlen
+    /* TODO: should fix this strlen */
     while (commands[i] != NULL) {
         if (strcmp(command, commands[i]) == 0) {
             return 1;
@@ -154,13 +155,13 @@ void play_game() {
     printf("Enter your command:\n");
     while (fgets(command_and_parameters, command_max_length, stdin) != NULL) {
         if (strlen(command_and_parameters) == COMMAND_AND_PARAMS_SIZE) {
-            // means that the command is too long the therefore should be considered as invalid.
+            /* means that the command is too long the therefore should be considered as invalid. */
             printf("ERROR: invalid command\n");
         }
         command = strtok(command_and_parameters, " \t\r\n");
         parameters = strtok(NULL, "\t\r\n");
         if (command == NULL) {
-            // we ignore any kind of blank characters
+            /*  we ignore any kind of blank characters */
             continue;
         }
         if (parameters != NULL) {
@@ -168,7 +169,7 @@ void play_game() {
         } else {
             splitted_params = NULL;
         }
-        // checking if the command is allowed in the current mode
+        /*  checking if the command is allowed in the current mode */
         if (GAME_MODE == 0) {
             if (!check_if_suitable_command(init_commands, command)) {
                 printf("ERROR: invalid command\n");
@@ -186,14 +187,14 @@ void play_game() {
             }
         }
         if (!execute_command(command, splitted_params)) {
-            // means that an exit command was given
+            /* means that an exit command was given */
             break;
         }
 
         print_board(game_board);
         printf("Enter your command:\n");
     }
-    // TODO: we should free more stuff here (game board etc.)
+    /* TODO: we should free more stuff here (game board etc.) */
     free(command_and_parameters);
     exit_game();
 }
@@ -206,14 +207,14 @@ void print_board(int **board) {
     int columns_counter;
     rows_counter = 0;
     if (ROWS_PER_BLOCK == 0 && COLUMNS_PER_BLOCK == 0) {
-        // means the board is empty and therefore there is nothing to print
+        /*  means the board is empty and therefore there is nothing to print */
         return;
     }
     for (i = 0; i < (ROWS_PER_BLOCK * COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK + 1); i++) {
-        // ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK is overall number of rows (including separator rows)
-        // ROWS_PER_BLOCK = m = number of rows of cells per block
+        /* ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK is overall number of rows (including separator rows) */
+        /* ROWS_PER_BLOCK = m = number of rows of cells per block */
         if ((i % (ROWS_PER_BLOCK + 1)) == 0) {
-            //separator row
+            /* separator row */
             for (z = 0; z < (4 * (ROWS_PER_BLOCK * COLUMNS_PER_BLOCK) + ROWS_PER_BLOCK); z++) {
                 printf("-");
             }
@@ -222,7 +223,7 @@ void print_board(int **board) {
         } else {
             columns_counter = 0;
             for (j = 0; j < (ROWS_PER_BLOCK * COLUMNS_PER_BLOCK + ROWS_PER_BLOCK + 1); j++) {
-                //COLUMNS_PER_BLOCK = n = number of rows of blocks
+                /* COLUMNS_PER_BLOCK = n = number of rows of blocks */
                 if ((j % (COLUMNS_PER_BLOCK + 1)) == 0) {
                     if (j == ROWS_PER_BLOCK * COLUMNS_PER_BLOCK + ROWS_PER_BLOCK) {
                         printf("|\n");

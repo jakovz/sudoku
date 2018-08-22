@@ -1,6 +1,6 @@
 #ifndef sudoku_GAME_LOGIC_H
 #define sudoku_GAME_LOGIC_H
-#endif //sudoku_GAME_LOGIC_H
+#endif /* sudoku_GAME_LOGIC_H */
 
 struct game_move{
     struct game_move *next;
@@ -19,8 +19,8 @@ int ROWS_PER_BLOCK;
 int COLUMNS_PER_BLOCK;
 int ROWS_COLUMNS_NUM;
 int EMPTY_CELLS_NUM;
-int GAME_MODE; // 0 - init mode, 1 - edit mode, 2 - solve mode
-int MARK_ERRORS; // 0 - do not mark errors, 1 - mark errors
+int GAME_MODE; /* 0 - init mode, 1 - edit mode, 2 - solve mode */
+int MARK_ERRORS; /* 0 - do not mark errors, 1 - mark errors */
 
 void execute_solve(char **params);
 void execute_edit(char **params);

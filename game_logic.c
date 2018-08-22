@@ -390,7 +390,23 @@ void generate(int x, int y) {
 }
 
 void num_solutions() {
+    int i;
+    int j;
     int ans;
+    current_indicators_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        current_indicators_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM); //TODO: *free* current_indicators_board
+    }
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            /*current_game_board[i][j] = game_board[i][j];*/
+            if (game_board[i][j] > 0) {
+                current_indicators_board[i][j] = 1;
+            } else {
+                current_indicators_board[i][j] = 0;
+            }
+        }
+    }
     if (check_if_board_erroneous() == 1) {
         printf("Error: board contains erroneous values\n");
         return;

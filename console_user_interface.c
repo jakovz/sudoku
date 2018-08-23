@@ -97,7 +97,7 @@ int execute_command(char *command, char **params) {
         execute_set_cell(params);
     } else if ((strcmp(all_commands[4], command) == 0)) {
         validate_solution();
-        print_board(solved_board);
+        print_board(solved_board); /* TODO: remove */
     } else if ((strcmp(all_commands[5], command) == 0)) {
         execute_generate(params);
     } else if ((strcmp(all_commands[6], command) == 0)) {

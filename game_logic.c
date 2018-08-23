@@ -284,8 +284,32 @@ void save_board(char *path) {
 }
 
 void get_hint(int x, int y) {
-    x = x + 1;
-    y = y + 1;
+    int tmp;
+    if (x > ROWS_COLUMNS_NUM || y > ROWS_COLUMNS_NUM) {
+        printf("Error: value not in range 1-%d", ROWS_COLUMNS_NUM);
+        return;
+    }
+    tmp = x;
+    x = y - 1;
+    y = tmp - 1;
+    if (check_if_board_erroneous()) {
+        printf("Error: board contains erroneous values\n");
+        return;
+    }
+    if (fixed_numbers_board[x][y] == 1) {
+        printf("Error: cell is fixed\n");
+        return;
+    }
+    if (game_board[x][y] != 0) {
+        printf("Error: cell already contains a value\n");
+        return;
+    }
+    if (solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, 1, solved_board)) {
+        printf("Hint: set cell to %d\n", solved_board[x][y]);
+    } else {
+        printf("Error: board is unsolvable\n");
+        return;
+    }
 }
 
 int validate_solution() {
@@ -464,7 +488,7 @@ void autofill() {
         printf("Error: board contains erroneous values\n");
         return;
     }
-    filled_board = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+    filled_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
     if (filled_board == NULL) {
         printf("Error: autofill failed\n");
         return;

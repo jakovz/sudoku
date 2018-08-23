@@ -122,9 +122,9 @@ int number_does_not_exist_in_block(int **game_board, int number, int row, int co
     int row_upper_bound;
     int column_lower_bound;
     int column_upper_bound;
-    row_lower_bound = (row / rows_per_block);
+    row_lower_bound = (row / rows_per_block)*rows_per_block;
     row_upper_bound = row_lower_bound + rows_per_block;
-    column_lower_bound = (column / columns_per_block);
+    column_lower_bound = (column / columns_per_block)*columns_per_block;
     column_upper_bound = column_lower_bound + columns_per_block;
     for (i = row_lower_bound; i < row_upper_bound; i++) {
         for (j = column_lower_bound; j < column_upper_bound; j++) {

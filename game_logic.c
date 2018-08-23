@@ -530,7 +530,7 @@ void autofill() {
 void clear_moves_list_from_first() {
     /* this function assumes game_moves has no prev value (the current move is the first move in the list) */
     struct game_move *current;
-    while ((*game_moves).next != NULL) {
+    while ((*game_moves).next != NULL && (*game_moves).prev != NULL) {
         current = game_moves;
         game_moves = (*game_moves).next;
         free(current);
@@ -550,7 +550,7 @@ void exit_game() {
     while ((*game_moves).prev != NULL) {
         game_moves = (*game_moves).prev;
     }
-    clear_moves_list_from_first();
+     clear_moves_list_from_first();
     /* TODO: check what else should be freed here */
 }
 

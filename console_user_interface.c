@@ -101,7 +101,7 @@ int execute_command(char *command, char **params) {
     } else if ((strcmp(all_commands[5], command) == 0)) {
         execute_generate(params);
     } else if ((strcmp(all_commands[6], command) == 0)) {
-        undo();
+        undo(1);
     } else if ((strcmp(all_commands[7], command) == 0)) {
         redo();
     } else if ((strcmp(all_commands[8], command) == 0)) {

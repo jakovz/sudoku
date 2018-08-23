@@ -186,7 +186,7 @@ void set_cell(int x, int y, int z) {
 }
 
 
-void undo() {
+void undo(int print_moves) {
     if ((*game_moves).prev == NULL) {
         printf("Error: no moves to undo\n");
         return;
@@ -200,8 +200,10 @@ void undo() {
                (*game_moves).old_z_value);
         EMPTY_CELLS_NUM--;
     } else {
-        printf("Undo %d,%d: from %d to %d\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
-               (*game_moves).new_z_value, (*game_moves).old_z_value);
+        if (print_moves){
+            printf("Undo %d,%d: from %d to %d\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
+                   (*game_moves).new_z_value, (*game_moves).old_z_value);
+        }
     }
     game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
     game_moves = (*game_moves).prev;
@@ -531,7 +533,7 @@ void clear_moves_list_from_first() {
 
 void restart_game() {
     while ((*game_moves).prev != NULL) {
-        undo();
+        undo(0);
     }
     clear_moves_list_from_first();
     printf("Board reset\n");
@@ -542,7 +544,7 @@ void exit_game() {
     while ((*game_moves).prev != NULL) {
         game_moves = (*game_moves).prev;
     }
-    free_next_moves();
+    clear_moves_list_from_first();
     /* TODO: check what else should be freed here */
 }
 

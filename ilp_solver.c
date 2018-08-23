@@ -69,7 +69,6 @@ int create_appear_once_in_column_constrains(GRBmodel *model, int *ind, double *v
                 ind[j] = i * rows_columns * rows_columns + j * rows_columns + v;
                 val[j] = 1.0;
             }
-
             error = GRBaddconstr(model, rows_columns, ind, val, GRB_EQUAL, 1.0, NULL);
         }
     }

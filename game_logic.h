@@ -38,7 +38,7 @@ int validate_solution();
 void get_hint(int x, int y);
 void save_board(char *path);
 void redo();
-void undo();
+void undo(int print_moves);
 void set_cell(int x, int y, int z);
 void mark_errors(int X);
 void edit(char *path);

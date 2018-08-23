@@ -53,7 +53,6 @@ int create_appear_once_in_row_constrains(GRBmodel *model, int *ind, double *val,
                 ind[i] = i * rows_columns * rows_columns + j * rows_columns + v;
                 val[i] = 1.0;
             }
-
             error = GRBaddconstr(model, rows_columns, ind, val, GRB_EQUAL, 1.0, NULL);
         }
     }
@@ -70,7 +69,6 @@ int create_appear_once_in_column_constrains(GRBmodel *model, int *ind, double *v
                 ind[j] = i * rows_columns * rows_columns + j * rows_columns + v;
                 val[j] = 1.0;
             }
-
             error = GRBaddconstr(model, rows_columns, ind, val, GRB_EQUAL, 1.0, NULL);
         }
     }
@@ -180,7 +178,7 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
     }
     printf("\n");
 
-    results = (double *) malloc(sizeof(int) * rows_columns);
+    results = (double *) malloc(sizeof(double) * rows_columns * rows_columns * rows_columns);
     if (results == NULL) goto QUIT;
 
     error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, rows_columns * rows_columns * rows_columns, results);
@@ -204,8 +202,8 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
         return 0;
     }
     free_ilp_variables(&ind, &val, &lb, &vtype);
-    /* GRBfreemodel(model);  free model TODO: fix */
-   /*  GRBfreeenv(env); free environment */
+    GRBfreemodel(model);  /* free model */
+    GRBfreeenv(env); /* free environment */
     return result;
 }
 

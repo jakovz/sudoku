@@ -186,7 +186,7 @@ void set_cell(int x, int y, int z) {
 }
 
 
-void undo() {
+void undo(int print_moves) {
     if ((*game_moves).prev == NULL) {
         printf("Error: no moves to undo\n");
         return;
@@ -200,8 +200,10 @@ void undo() {
                (*game_moves).old_z_value);
         EMPTY_CELLS_NUM--;
     } else {
-        printf("Undo %d,%d: from %d to %d\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
-               (*game_moves).new_z_value, (*game_moves).old_z_value);
+        if (print_moves){
+            printf("Undo %d,%d: from %d to %d\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
+                   (*game_moves).new_z_value, (*game_moves).old_z_value);
+        }
     }
     game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
     game_moves = (*game_moves).prev;
@@ -241,12 +243,10 @@ void save_board(char *path) {
         return;
     } else if (GAME_MODE == 1) {
         /*Edit mode*/
-        fflush(stdout);
         for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
             for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
                 if (check_if_board_erroneous()) {
                     printf("ERROR: board contains erroneous values\n");
-                    fflush(stdout);
                     return;
                 }
             }
@@ -256,8 +256,6 @@ void save_board(char *path) {
             return;
         }
     }
-    printf("before file opening\n");
-    fflush(stdout);
     fp = fopen(path, "w+");
     if (fp == NULL) {
         printf("Error: File cannot be created or modified\n");
@@ -288,8 +286,32 @@ void save_board(char *path) {
 }
 
 void get_hint(int x, int y) {
-    x = x + 1;
-    y = y + 1;
+    int tmp;
+    if (x > ROWS_COLUMNS_NUM || y > ROWS_COLUMNS_NUM) {
+        printf("Error: value not in range 1-%d", ROWS_COLUMNS_NUM);
+        return;
+    }
+    tmp = x;
+    x = y - 1;
+    y = tmp - 1;
+    if (check_if_board_erroneous()) {
+        printf("Error: board contains erroneous values\n");
+        return;
+    }
+    if (fixed_numbers_board[x][y] == 1) {
+        printf("Error: cell is fixed\n");
+        return;
+    }
+    if (game_board[x][y] != 0) {
+        printf("Error: cell already contains a value\n");
+        return;
+    }
+    if (solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, 1, solved_board)) {
+        printf("Hint: set cell to %d\n", solved_board[x][y]);
+    } else {
+        printf("Error: board is unsolvable\n");
+        return;
+    }
 }
 
 int validate_solution() {
@@ -464,11 +486,11 @@ void autofill() {
     int j;
     int new_value;
     int **filled_board;
-    if (!validate_solution()) {
+    if (check_if_board_erroneous()) {
         printf("Error: board contains erroneous values\n");
         return;
     }
-    filled_board = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+    filled_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
     if (filled_board == NULL) {
         printf("Error: autofill failed\n");
         return;
@@ -511,7 +533,7 @@ void clear_moves_list_from_first() {
 
 void restart_game() {
     while ((*game_moves).prev != NULL) {
-        undo();
+        undo(0);
     }
     clear_moves_list_from_first();
     printf("Board reset\n");
@@ -522,7 +544,7 @@ void exit_game() {
     while ((*game_moves).prev != NULL) {
         game_moves = (*game_moves).prev;
     }
-    free_next_moves();
+    clear_moves_list_from_first();
     /* TODO: check what else should be freed here */
 }
 

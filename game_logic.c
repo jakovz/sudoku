@@ -241,12 +241,10 @@ void save_board(char *path) {
         return;
     } else if (GAME_MODE == 1) {
         /*Edit mode*/
-        fflush(stdout);
         for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
             for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
                 if (check_if_board_erroneous()) {
                     printf("ERROR: board contains erroneous values\n");
-                    fflush(stdout);
                     return;
                 }
             }
@@ -256,8 +254,6 @@ void save_board(char *path) {
             return;
         }
     }
-    printf("before file opening\n");
-    fflush(stdout);
     fp = fopen(path, "w+");
     if (fp == NULL) {
         printf("Error: File cannot be created or modified\n");
@@ -464,7 +460,7 @@ void autofill() {
     int j;
     int new_value;
     int **filled_board;
-    if (!validate_solution()) {
+    if (check_if_board_erroneous()) {
         printf("Error: board contains erroneous values\n");
         return;
     }

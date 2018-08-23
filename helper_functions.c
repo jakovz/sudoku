@@ -137,7 +137,7 @@ int number_does_not_exist_in_block(int **game_board, int number, int row, int co
 }
 
 int number_is_available(int **game_board, int number, int row, int column, int rows_per_block, int columns_per_block){
-    if (number_does_not_exist_in_row(game_board, number, row, column, rows_per_block) && number_does_not_exist_in_column(game_board, number, row, column, rows_per_block) &&
+    if (number_does_not_exist_in_row(game_board, number, row, column, rows_per_block*columns_per_block) && number_does_not_exist_in_column(game_board, number, row, column, rows_per_block*columns_per_block) &&
         number_does_not_exist_in_block(game_board, number, row, column, rows_per_block, columns_per_block)){
         return 1;
     }

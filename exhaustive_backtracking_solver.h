@@ -16,5 +16,5 @@ struct StackNode* newNode(int rows_index, int columns_index, int current);
 int isEmpty(struct StackNode *root);
 void push(struct StackNode** root, int rows_index, int columns_index, int current);
 struct StackNode pop(struct StackNode** root);
-int exhaustive_backtracking(int rows_index, int columns_index, int **new_solved_board, int current, int rows_columns_num,
+int exhaustive_backtracking(int rows_index, int columns_index, int **game_board, int cell_current_value, int rows_columns_num,
                             int rows_per_block, int columns_per_block);

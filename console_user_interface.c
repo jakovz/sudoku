@@ -190,7 +190,6 @@ void play_game() {
             /* means that an exit command was given */
             break;
         }
-
         print_board(game_board);
         printf("Enter your command:\n");
     }

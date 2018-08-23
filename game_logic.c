@@ -200,7 +200,7 @@ void undo(int print_moves) {
                (*game_moves).old_z_value);
         EMPTY_CELLS_NUM--;
     } else {
-        if (print_moves){
+        if (print_moves) {
             printf("Undo %d,%d: from %d to %d\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
                    (*game_moves).new_z_value, (*game_moves).old_z_value);
         }
@@ -420,14 +420,17 @@ void num_solutions() {
     int i;
     int j;
     int ans;
+    int **exhaustive_board;
+    exhaustive_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
     current_indicators_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
-    if (current_indicators_board == NULL) {
+    if (current_indicators_board == NULL || exhaustive_board == NULL) {
         printf("Error: num_solutions failed\n");
         return;
     }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         current_indicators_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
-        if (current_indicators_board[i] == NULL) {
+        exhaustive_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+        if (current_indicators_board[i] == NULL || exhaustive_board[i] == NULL) {
             printf("Error: num_solutions failed\n");
             return;
         }
@@ -446,18 +449,21 @@ void num_solutions() {
         printf("Error: board contains erroneous values\n");
         return;
     }
-    ans = exhaustive_backtracking(0, 0, game_board, 0, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK,
-                                  COLUMNS_PER_BLOCK); /* TODO: correct parameters? */
+    copy_board(game_board,exhaustive_board, 0);
+    ans = exhaustive_backtracking(0, 0, exhaustive_board, 0, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK,
+                                  COLUMNS_PER_BLOCK);
     printf("Number of solutions: %d\n", ans);
     if (ans == 1) {
         printf("This is a good board!\n");
-    } else {
+    } else if (ans>1){
         printf("The puzzle has more than 1 solution, try to edit it further\n");
     }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         free(current_indicators_board[i]);
+        free(exhaustive_board[i]);
     }
     free(current_indicators_board);
+    free(exhaustive_board);
 }
 
 

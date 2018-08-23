@@ -22,6 +22,22 @@ void copy_board(int **from, int **to, int save_moves) {
     }
 }
 
+int check_if_board_erroneous() {
+    int i;
+    int j;
+    int number;
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            number = game_board[i][j];
+            if (number != 0 && !number_is_available(game_board, number, i, j, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
+                printf("number is %d, i:%d, j:%d\n", number, i, j);
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 void solve(char *path) {
     /* loads the board from file */
     FILE *fp;
@@ -222,12 +238,15 @@ void save_board(char *path) {
     /*save is only available in Edit and Solve modes*/
     if ((GAME_MODE != 1) && (GAME_MODE != 2)) {
         printf("ERROR: invalid command\n");
+        return;
     } else if (GAME_MODE == 1) {
         /*Edit mode*/
+        fflush(stdout);
         for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
             for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
-                if (erroneous_board[i][j] == 1) {
+                if (check_if_board_erroneous()) {
                     printf("ERROR: board contains erroneous values\n");
+                    fflush(stdout);
                     return;
                 }
             }
@@ -237,6 +256,8 @@ void save_board(char *path) {
             return;
         }
     }
+    printf("before file opening\n");
+    fflush(stdout);
     fp = fopen(path, "w+");
     if (fp == NULL) {
         printf("Error: File cannot be created or modified\n");
@@ -269,22 +290,6 @@ void save_board(char *path) {
 void get_hint(int x, int y) {
     x = x + 1;
     y = y + 1;
-}
-
-int check_if_board_erroneous() {
-    int i;
-    int j;
-    int number;
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
-            number = game_board[i][j];
-            if (number != 0 && !number_is_available(game_board, number, i, j, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
-                printf("number is %d, i:%d, j:%d\n", number, i, j);
-                return 1;
-            }
-        }
-    }
-    return 0;
 }
 
 int validate_solution() {
@@ -394,8 +399,16 @@ void num_solutions() {
     int j;
     int ans;
     current_indicators_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
+    if (current_indicators_board == NULL) {
+        printf("Error: num_solutions failed\n");
+        return;
+    }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        current_indicators_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM); //TODO: *free* current_indicators_board
+        current_indicators_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+        if (current_indicators_board[i] == NULL) {
+            printf("Error: num_solutions failed\n");
+            return;
+        }
     }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
@@ -419,6 +432,10 @@ void num_solutions() {
     } else {
         printf("The puzzle has more than 1 solution, try to edit it further\n");
     }
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        free(current_indicators_board[i]);
+    }
+    free(current_indicators_board);
 }
 
 

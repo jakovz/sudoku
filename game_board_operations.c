@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include "game_board_operations.h"
-#include "game_moves_list.h"
 
 void read_board_from_file(FILE *file_descriptor) {
     int i;

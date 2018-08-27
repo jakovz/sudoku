@@ -51,7 +51,7 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **game_board,
     counter = 0;
     first = 1;
     num_of_solutions = 0;
-    available_numbers = (int *) malloc(sizeof(int) * rows_columns_num);
+    available_numbers = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
     if (available_numbers == NULL) {
         printf("Error: Exhaustive backtracking failed\n");
         return -1;
@@ -59,19 +59,19 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **game_board,
 
     while ((!isEmpty(root)) || first) {
         first = 0;
-        while ((rows_index < rows_columns_num) && (columns_index < rows_columns_num)) {
+        while ((rows_index < ROWS_COLUMNS_NUM) && (columns_index < ROWS_COLUMNS_NUM)) {
             if (current_indicators_board[rows_index][columns_index] == 0) {
                 /* means that this is the first free cell at this step */
                 if (game_board[rows_index][columns_index] == 0) {
                     cell_current_value = 0;
                 }
-                for (i = 0; i < rows_columns_num; i++) {
+                for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
                     available_numbers[i] = 0;
                 }
                 counter = 0;
                 /* creating the actual available numbers array*/
                 get_available_numbers_for_set(available_numbers, rows_index, columns_index);
-                for (i = 0; i < rows_columns_num; i++) {
+                for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
                     if (available_numbers[i] == 0 && (i + 1) > cell_current_value) {
                         counter++;
                     }
@@ -88,18 +88,18 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **game_board,
                     columns_index = tmp.columns_index;
                     cell_current_value = tmp.current;
                     /*initializing every cell after the one we just popped*/
-                    if ((columns_index + 1) < rows_columns_num) {
+                    if ((columns_index + 1) < ROWS_COLUMNS_NUM) {
                         start_row = rows_index;
                         start_column = columns_index + 1;
-                    } else if ((rows_index + 1) < rows_columns_num) {
+                    } else if ((rows_index + 1) < ROWS_COLUMNS_NUM) {
                         start_row = rows_index + 1;
                         start_column = 0;
                     } else {
-                        start_row = rows_columns_num;
-                        start_column = rows_columns_num;
+                        start_row = ROWS_COLUMNS_NUM;
+                        start_column = ROWS_COLUMNS_NUM;
                     }
-                    for (i = start_row; i < rows_columns_num; i++) {
-                        for (j = start_column; j < rows_columns_num; j++) {
+                    for (i = start_row; i < ROWS_COLUMNS_NUM; i++) {
+                        for (j = start_column; j < ROWS_COLUMNS_NUM; j++) {
                             if (current_indicators_board[i][j] == 0) {
                                 game_board[i][j] = 0;
                             }
@@ -108,7 +108,7 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **game_board,
                     continue;
                 }
                 /* if we got here there are more available numbers for this cell */
-                for (p = 0; p < rows_columns_num; p++) {
+                for (p = 0; p < ROWS_COLUMNS_NUM; p++) {
                     if (available_numbers[p] == 0 && (p + 1) > cell_current_value) {
                         game_board[rows_index][columns_index] = p + 1;
                         cell_current_value = p + 1;
@@ -117,13 +117,13 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **game_board,
                 }
                 push(&root, rows_index, columns_index, cell_current_value);
             }
-            if ((columns_index + 1) < rows_columns_num) {
+            if ((columns_index + 1) < ROWS_COLUMNS_NUM) {
                 columns_index++;
-            } else if ((rows_index + 1) < rows_columns_num) {
+            } else if ((rows_index + 1) < ROWS_COLUMNS_NUM) {
                 columns_index = 0;
                 rows_index++;
             }/*else if this is the last cell and its value is already set - increment value of last cell ||OR|| backtrack if can't increment*/
-            else if (((rows_index + 1) == rows_columns_num) && ((columns_index + 1) == rows_columns_num)) {
+            else if (((rows_index + 1) == ROWS_COLUMNS_NUM) && ((columns_index + 1) == ROWS_COLUMNS_NUM)) {
                 num_of_solutions++;
                 tmp = pop(&root);
                 rows_index = tmp.rows_index;

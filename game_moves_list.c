@@ -21,6 +21,10 @@ void update_moves_list(int x, int y, int z, int old, int autofill_generate_value
     last_move = game_moves;
     free_next_moves();
     (*game_moves).next = (struct game_move *) malloc(sizeof(struct game_move));
+    if ((*game_moves).next == NULL){
+        printf("Error: could not set the move\n");
+        exit(-1);
+    }
     game_moves = (*game_moves).next;
     (*game_moves).x_value = x;
     (*game_moves).y_value = y;
@@ -32,7 +36,6 @@ void update_moves_list(int x, int y, int z, int old, int autofill_generate_value
 }
 
 void clear_moves_list() {
-    /* this function assumes game_moves has no prev value (the current move is the first move in the list) */
     struct game_move *current;
     while ((*game_moves).prev != NULL) {
         game_moves = (*game_moves).prev;
@@ -42,11 +45,14 @@ void clear_moves_list() {
         free(game_moves);
         return;
     }
-    game_moves = (*game_moves).next;
     while ((*game_moves).next != NULL) {
         current = game_moves;
         game_moves = (*game_moves).next;
         free(current);
+    }
+    if ((*game_moves).next == NULL) {
+        free(game_moves);
+        return;
     }
 }
 

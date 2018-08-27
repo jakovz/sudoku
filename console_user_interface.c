@@ -76,7 +76,6 @@ void execute_mark_errors(char **params) {
     mark_errors(mark_errors_param);
 }
 
-
 int execute_command(char *command, char **params) {
     /* gets the command as a string and invokes it's corresponding function */
     if (strcmp(all_commands[0], command) == 0) {
@@ -122,7 +121,6 @@ int execute_command(char *command, char **params) {
     }
     return 1;
 }
-
 
 int check_if_suitable_command(const char *commands[], char *command) {
     int i;
@@ -190,7 +188,6 @@ void play_game() {
             /* means that an exit command was given */
             break;
         }
-        print_board(game_board);
         printf("Enter your command:\n");
     }
     for (i = 0; i < (int) count; i++) {

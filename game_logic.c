@@ -99,7 +99,7 @@ int check_if_board_erroneous() {
 }
 
 
-void free_game_boards(){
+void free_game_boards() {
     int i;
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         free(game_board[i]);
@@ -120,7 +120,7 @@ void clear_moves_list() {
         game_moves = (*game_moves).prev;
     }
     /* now we are on the first (sentinel) move */
-    if ((*game_moves).next==NULL){
+    if ((*game_moves).next == NULL) {
         free(game_moves);
         return;
     }
@@ -135,7 +135,7 @@ void clear_moves_list() {
 void init_game() {
     int i;
     int j;
-    if(GAME_ALREADY_INITIALIZED){
+    if (GAME_ALREADY_INITIALIZED) {
         /* making sure no memory is left allocated from the previous allocation */
         free_game_boards();
         clear_moves_list();
@@ -171,7 +171,7 @@ void init_game() {
         }
     }
     GAME_ALREADY_INITIALIZED = 1;
-    srand((unsigned int)time(NULL)); /* setting seed for random */
+    srand((unsigned int) time(NULL)); /* setting seed for random */
 }
 
 
@@ -260,7 +260,8 @@ void set_cell(int x, int y, int z) {
             erroneous_board[x][y] = 1;
         }
     }
-    print_board(game_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE, MARK_ERRORS);
+    print_board(game_board, fixed_numbers_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE,
+                MARK_ERRORS);
     if (EMPTY_CELLS_NUM == 0 && GAME_MODE == 2) {
         if (!validate_solution()) {
             printf("Puzzle solution erroneous\n");
@@ -278,23 +279,24 @@ void undo(int print_moves) {
         printf("Error: no moves to undo\n");
         return;
     }
-    if ((*game_moves).old_z_value == 0) {
-        printf("Undo %d,%d: from %d to _\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
-               (*game_moves).new_z_value);
+    game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
+    game_moves = (*game_moves).prev;
+    print_board(game_board, fixed_numbers_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE,
+                MARK_ERRORS);
+    if ((*(*game_moves).next).old_z_value == 0) {
+        printf("Undo %d,%d: from %d to _\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
+               (*(*game_moves).next).new_z_value);
         EMPTY_CELLS_NUM++;
-    } else if ((*game_moves).new_z_value == 0) {
-        printf("Undo %d,%d: from _ to %d\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
-               (*game_moves).old_z_value);
+    } else if ((*(*game_moves).next).new_z_value == 0) {
+        printf("Undo %d,%d: from _ to %d\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
+               (*(*game_moves).next).old_z_value);
         EMPTY_CELLS_NUM--;
     } else {
         if (print_moves) {
-            printf("Undo %d,%d: from %d to %d\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
-                   (*game_moves).new_z_value, (*game_moves).old_z_value);
+            printf("Undo %d,%d: from %d to %d\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
+                   (*(*game_moves).next).new_z_value, (*(*game_moves).next).old_z_value);
         }
     }
-    game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
-    game_moves = (*game_moves).prev;
-    print_board(game_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE, MARK_ERRORS);
 }
 
 void redo() {
@@ -304,22 +306,23 @@ void redo() {
         return;
     }
     new_value = (*(*game_moves).next).new_z_value;
-    if ((*(*game_moves).next).new_z_value == 0) {
-        printf("Redo %d,%d: from %d to _\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
-               (*(*game_moves).next).old_z_value);
-        EMPTY_CELLS_NUM++;
-    } else if ((*(*game_moves).next).old_z_value == 0) {
-        printf("Redo %d,%d: from _ to %d\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
-               (*(*game_moves).next).new_z_value);
-        EMPTY_CELLS_NUM--;
-    } else {
-        printf("Redo %d,%d: from %d to %d\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
-               (*(*game_moves).next).new_z_value,
-               (*(*game_moves).next).old_z_value);
-    }
     game_board[(*(*game_moves).next).x_value][(*(*game_moves).next).y_value] = new_value;
     game_moves = (*game_moves).next;
-    print_board(game_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE, MARK_ERRORS);
+    print_board(game_board, fixed_numbers_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE,
+                MARK_ERRORS);
+    if ((*game_moves).new_z_value == 0) {
+        printf("Redo %d,%d: from %d to _\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
+               (*game_moves).old_z_value);
+        EMPTY_CELLS_NUM++;
+    } else if ((*game_moves).old_z_value == 0) {
+        printf("Redo %d,%d: from _ to %d\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
+               (*game_moves).new_z_value);
+        EMPTY_CELLS_NUM--;
+    } else {
+        printf("Redo %d,%d: from %d to %d\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
+               (*game_moves).new_z_value,
+               (*game_moves).old_z_value);
+    }
 }
 
 void save_board(char *path) {
@@ -331,11 +334,11 @@ void save_board(char *path) {
     } else if (GAME_MODE == 1) {
         /*Edit mode*/
         if (check_if_board_erroneous()) {
-            printf("ERROR: board contains erroneous values\n");
+            printf("Error: board contains erroneous values\n");
             return;
         }
         if (validate_solution() == 0) {
-            printf("ERROR: board validation failed\n");
+            printf("Error: board validation failed\n");
             return;
         }
     }
@@ -480,6 +483,8 @@ void generate(int x, int y) {
         tmp_board[x_index][y_index] = 0;
     }
     copy_board(tmp_board, game_board, 1);
+    print_board(game_board, fixed_numbers_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE,
+                MARK_ERRORS);
 }
 
 void num_solutions() {
@@ -491,14 +496,14 @@ void num_solutions() {
     current_indicators_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
     if (current_indicators_board == NULL || exhaustive_board == NULL) {
         printf("Error: num_solutions failed\n");
-        return;
+        exit(-1);
     }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         current_indicators_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         exhaustive_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         if (current_indicators_board[i] == NULL || exhaustive_board[i] == NULL) {
             printf("Error: num_solutions failed\n");
-            return;
+            exit(-1);
         }
     }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
@@ -538,6 +543,7 @@ int get_autofill_value(int x, int y) {
     int available_number;
     int count; /*  counts the number of available numbers that can be filled in the empty cell. */
     count = 0;
+    available_number = 0;
     for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
         /* iterating all possible numbers */
         if (number_is_available(game_board, i, x, y, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
@@ -565,13 +571,13 @@ void autofill() {
     filled_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
     if (filled_board == NULL) {
         printf("Error: autofill failed\n");
-        return;
+        exit(-1);
     }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         filled_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         if (filled_board[i] == NULL) {
             printf("Error: autofill failed\n");
-            return;
+            exit(-1);
         }
     }
     copy_board(game_board, filled_board, 0);
@@ -582,6 +588,7 @@ void autofill() {
                 if ((new_value = get_autofill_value(i, j)) > 0) {
                     /* means that there is an autofill option */
                     filled_board[i][j] = new_value; /* we do not want the new values to affect autofill. */
+                    printf("Cell <%d,%d> set to %d\n", i, j, new_value);
                 }
             }
         }

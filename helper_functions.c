@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 #include <malloc.h>
 #include "helper_functions.h"
 
@@ -39,19 +38,26 @@ char **str_split(char *a_str, const char a_delim, size_t *count) {
     (*count)++;
 
     result = malloc(sizeof(char *) * (*count));
-
-    if (result) {
-        size_t idx = 0;
-        char *token = strtok(a_str, delim);
-
-        while (token) {
-            assert(idx < (*count));
-            *(result + idx++) = strdup(token);
-            token = strtok(0, delim);
-        }
-        assert(idx == (*count) - 1);
-        *(result + idx) = 0;
+    if (result == NULL){
+        printf("Error: str_split failed\n");
+        exit(-1);
     }
+    size_t idx = 0;
+    char *token = strtok(a_str, delim);
+
+    while (token) {
+        if (idx >= (*count)){
+            printf("Error: parsing parameters failed\n");
+            exit(-1);
+        }
+        *(result + idx++) = strdup(token);
+        token = strtok(0, delim);
+    }
+    if (idx != (*count) - 1){
+        printf("Error: parsing parameters failed\n");
+        exit(-1);
+    }
+    *(result + idx) = 0;
 
     return result;
 }

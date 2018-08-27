@@ -1,19 +1,15 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
 #include "helper_functions.h"
 
-char *strdup(const char *s) {
-    size_t size = strlen(s) + 1;
-    char *p = malloc(size);
-    if (p) {
-        memcpy(p, s, size);
-    }
-    return p;
-}
-
 /* Credit: https://stackoverflow.com/questions/9210528/split-string-with-delimiters-in-c */
 char **str_split(char *a_str, const char a_delim, size_t *count) {
+    size_t size;
+    size_t idx;
+    char *token;
+    char *p;
     char **result = 0;
     char *tmp = a_str;
     char *last_comma = 0;
@@ -42,23 +38,28 @@ char **str_split(char *a_str, const char a_delim, size_t *count) {
         printf("Error: str_split failed\n");
         exit(-1);
     }
-    size_t idx = 0;
-    char *token = strtok(a_str, delim);
+    idx = 0;
+    token = strtok(a_str, delim);
 
     while (token) {
         if (idx >= (*count)){
             printf("Error: parsing parameters failed\n");
             exit(-1);
         }
-        *(result + idx++) = strdup(token);
+        size = strlen(token) + 1;
+        p = malloc(size);
+        if (p) {
+            memcpy(p, token, size);
+        }
+        *(result + idx++) = p;
         token = strtok(0, delim);
+        free(p);
     }
     if (idx != (*count) - 1){
         printf("Error: parsing parameters failed\n");
         exit(-1);
     }
     *(result + idx) = 0;
-
     return result;
 }
 

@@ -49,9 +49,9 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **game_board,
     int start_column;
     struct StackNode *root;
     struct StackNode tmp;
+    int first;
     root = NULL;
     counter = 0;
-    int first;
     first = 1;
     num_of_solutions = 0;
     available_numbers = (int *) malloc(sizeof(int) * rows_columns_num);

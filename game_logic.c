@@ -86,6 +86,36 @@ int check_if_board_erroneous() {
     return 0;
 }
 
+
+void free_game_boards(){
+    int i;
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        free(game_board[i]);
+        free(fixed_numbers_board[i]);
+        free(erroneous_board[i]);
+        free(solved_board[i]);
+    }
+    free(game_board);
+    free(erroneous_board);
+    free(fixed_numbers_board);
+    free(solved_board);
+}
+
+void clear_moves_list() {
+    /* this function assumes game_moves has no prev value (the current move is the first move in the list) */
+    struct game_move *current;
+    while ((*game_moves).prev != NULL) {
+        game_moves = (*game_moves).prev;
+    }
+    /* now we are on the first (sentinel) move */
+    game_moves = (*game_moves).next;
+    while ((*game_moves).next != NULL) {
+        current = game_moves;
+        game_moves = (*game_moves).next;
+        free(current);
+    }
+}
+
 void init_game() {
     int i;
     int j;
@@ -125,20 +155,6 @@ void init_game() {
     }
     GAME_ALREADY_INITIALIZED = 1;
     srand(time(NULL)); /* setting seed for random */
-}
-
-void free_game_boards(){
-    int i;
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        free(game_board[i]);
-        free(fixed_numbers_board[i]);
-        free(erroneous_board[i]);
-        free(solved_board[i]);
-    }
-    free(game_board);
-    free(erroneous_board);
-    free(fixed_numbers_board);
-    free(solved_board);
 }
 
 
@@ -297,8 +313,6 @@ void redo() {
 
 void save_board(char *path) {
     FILE *fp;
-    int i;
-    int j;
     /*save is only available in Edit and Solve modes*/
     if ((GAME_MODE != 1) && (GAME_MODE != 2)) {
         printf("ERROR: invalid command\n");
@@ -566,21 +580,6 @@ void autofill() {
         free(filled_board[i]);
     }
     free(filled_board);
-}
-
-void clear_moves_list() {
-    /* this function assumes game_moves has no prev value (the current move is the first move in the list) */
-    struct game_move *current;
-    while ((*game_moves).prev != NULL) {
-        game_moves = (*game_moves).prev;
-    }
-    /* now we are on the first (sentinel) move */
-    game_moves = (*game_moves).next;
-    while ((*game_moves).next != NULL) {
-        current = game_moves;
-        game_moves = (*game_moves).next;
-        free(current);
-    }
 }
 
 void restart_game() {

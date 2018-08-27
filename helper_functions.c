@@ -45,11 +45,11 @@ char **str_split(char *a_str, const char a_delim, size_t *count) {
         char *token = strtok(a_str, delim);
 
         while (token) {
-            assert(idx < count);
+            assert(idx < (*count));
             *(result + idx++) = strdup(token);
             token = strtok(0, delim);
         }
-        assert(idx == count - 1);
+        assert(idx == (*count) - 1);
         *(result + idx) = 0;
     }
 
@@ -140,4 +140,62 @@ int number_is_available(int **game_board, int number, int row, int column, int r
         return 1;
     }
     return 0;
+}
+
+void print_board(int **board, int row_per_block, int columns_per_block, int game_mode, int mark_errors) {
+    int i;
+    int j;
+    int z;
+    int rows_counter;
+    int columns_counter;
+    rows_counter = 0;
+    if (row_per_block == 0 && columns_per_block == 0) {
+        /*  means the board is empty and therefore there is nothing to print */
+        return;
+    }
+    for (i = 0; i < (row_per_block * columns_per_block + columns_per_block + 1); i++) {
+        /* ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK is overall number of rows (including separator rows) */
+        /* ROWS_PER_BLOCK = m = number of rows of cells per block */
+        if ((i % (row_per_block + 1)) == 0) {
+            /* separator row */
+            for (z = 0; z < (4 * (row_per_block * columns_per_block) + row_per_block); z++) {
+                printf("-");
+            }
+            printf("-\n");
+            rows_counter++;
+        } else {
+            columns_counter = 0;
+            for (j = 0; j < (row_per_block * columns_per_block + row_per_block + 1); j++) {
+                /* COLUMNS_PER_BLOCK = n = number of rows of blocks */
+                if ((j % (columns_per_block + 1)) == 0) {
+                    if (j == row_per_block * columns_per_block + row_per_block) {
+                        printf("|\n");
+                    } else {
+                        printf("|");
+                    }
+                    columns_counter++;
+                } else {
+                    printf(" ");
+                    if (board[i - rows_counter][j - columns_counter] == 0) {
+                        printf("  ");
+                    } else {
+                        printf("%2d", board[i - rows_counter][j - columns_counter]);
+                    }
+                    if (fixed_numbers_board[i - rows_counter][j - columns_counter] == 1) {
+                        /*means that this is a fixed cell*/
+                        printf(".");
+                    } else if (game_mode == 1 || mark_errors == 1) {
+                        if (erroneous_board[i - rows_counter][j - columns_counter] == 1) {
+                            /*means that this is an erroneous value*/
+                            printf("*");
+                        } else {
+                            printf(" ");
+                        }
+                    } else {
+                        printf(" ");
+                    }
+                }
+            }
+        }
+    }
 }

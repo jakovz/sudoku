@@ -165,7 +165,7 @@ void play_game() {
             continue;
         }
         if (parameters != NULL) {
-            splitted_params = str_split(parameters, ' ', &count);
+            splitted_params = str_split(parameters, ' ');
         } else {
             splitted_params = NULL;
         }

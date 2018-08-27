@@ -148,8 +148,8 @@ void init_game() {
     fixed_numbers_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
     solved_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
     if (game_board == NULL || erroneous_board == NULL || fixed_numbers_board == NULL || solved_board == NULL) {
-        printf("Error: game initialization failed\n"); /* TODO: validate that this is the message that should be printed */
-        return;
+        printf("Error: game initialization failed\n");
+        exit(-1);
     }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         game_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
@@ -158,8 +158,8 @@ void init_game() {
         solved_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         if (game_board[i] == NULL || erroneous_board[i] == NULL || fixed_numbers_board[i] == NULL ||
             solved_board[i] == NULL) {
-            printf("Error: game initialization failed\n"); /* TODO: validate that this is the message that should be printed */
-            return;
+            printf("Error: game initialization failed\n");
+            exit(-1);
         }
     }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
@@ -171,7 +171,7 @@ void init_game() {
         }
     }
     GAME_ALREADY_INITIALIZED = 1;
-    srand(time(NULL)); /* setting seed for random */
+    srand((unsigned int)time(NULL)); /* setting seed for random */
 }
 
 
@@ -201,7 +201,7 @@ void edit(char *path) {
         /* loads the board from a file */
         fp = fopen(path, "r");
         if (fp == NULL) {
-            printf("Error: File doesn't exist or cannot be opened\n");
+            printf("Error: File cannot be opened\n");
             return;
         } else {
             read_from_file(fp);

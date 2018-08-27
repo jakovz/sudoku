@@ -192,68 +192,10 @@ void play_game() {
         print_board(game_board);
         printf("Enter your command:\n");
     }
-    for (i=0; i<count; i++){
+    for (i = 0; i < (int) count; i++) {
         free(splitted_params[i]);
     }
     free(splitted_params);
     free(command_and_parameters);
     exit_game();
-}
-
-void print_board(int **board) {
-    int i;
-    int j;
-    int z;
-    int rows_counter;
-    int columns_counter;
-    rows_counter = 0;
-    if (ROWS_PER_BLOCK == 0 && COLUMNS_PER_BLOCK == 0) {
-        /*  means the board is empty and therefore there is nothing to print */
-        return;
-    }
-    for (i = 0; i < (ROWS_PER_BLOCK * COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK + 1); i++) {
-        /* ROWS_PER_BLOCK*COLUMNS_PER_BLOCK + COLUMNS_PER_BLOCK is overall number of rows (including separator rows) */
-        /* ROWS_PER_BLOCK = m = number of rows of cells per block */
-        if ((i % (ROWS_PER_BLOCK + 1)) == 0) {
-            /* separator row */
-            for (z = 0; z < (4 * (ROWS_PER_BLOCK * COLUMNS_PER_BLOCK) + ROWS_PER_BLOCK); z++) {
-                printf("-");
-            }
-            printf("-\n");
-            rows_counter++;
-        } else {
-            columns_counter = 0;
-            for (j = 0; j < (ROWS_PER_BLOCK * COLUMNS_PER_BLOCK + ROWS_PER_BLOCK + 1); j++) {
-                /* COLUMNS_PER_BLOCK = n = number of rows of blocks */
-                if ((j % (COLUMNS_PER_BLOCK + 1)) == 0) {
-                    if (j == ROWS_PER_BLOCK * COLUMNS_PER_BLOCK + ROWS_PER_BLOCK) {
-                        printf("|\n");
-                    } else {
-                        printf("|");
-                    }
-                    columns_counter++;
-                } else {
-                    printf(" ");
-                    if (board[i - rows_counter][j - columns_counter] == 0) {
-                        printf("  ");
-                    } else {
-                        printf("%2d", board[i - rows_counter][j - columns_counter]);
-                    }
-                    if (fixed_numbers_board[i - rows_counter][j - columns_counter] == 1) {
-                        /*means that this is a fixed cell*/
-                        printf(".");
-                    } else if (GAME_MODE == 1 || MARK_ERRORS == 1) {
-                        if (erroneous_board[i - rows_counter][j - columns_counter] == 1) {
-                            /*means that this is an erroneous value*/
-                            printf("*");
-                        } else {
-                            printf(" ");
-                        }
-                    } else {
-                        printf(" ");
-                    }
-                }
-            }
-        }
-    }
 }

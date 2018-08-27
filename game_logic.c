@@ -2,178 +2,10 @@
 #include <stdio.h>
 #include <time.h>
 #include "game_logic.h"
-#include "helper_functions.h"
 #include "ilp_solver.h"
 #include "exhaustive_backtracking_solver.h"
-
-void initialize_game_moves_list() {
-    if (game_moves == NULL) {
-        /* initializing moves list */
-        game_moves = (struct game_move *) malloc(sizeof(struct game_move));
-        (*game_moves).prev = NULL;
-        (*game_moves).next = NULL;
-        (*game_moves).y_value = 0;
-        (*game_moves).x_value = 0;
-        (*game_moves).new_z_value = 0;
-        (*game_moves).old_z_value = 0;
-    }
-}
-
-void read_from_file(FILE *file_descriptor) {
-    int i;
-    int j;
-    fscanf(file_descriptor, " "); /*skip whitespaces*/
-    fscanf(file_descriptor, "%d", &ROWS_PER_BLOCK);
-    fscanf(file_descriptor, " "); /*skip whitespaces*/
-    fscanf(file_descriptor, "%d", &COLUMNS_PER_BLOCK);
-    init_game();
-    fscanf(file_descriptor, " "); /*skip whitespaces*/
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
-            fscanf(file_descriptor, "%d", &(game_board[i][j]));
-            if (feof(file_descriptor)) {
-                break;
-            } else if (fgetc(file_descriptor) == '.') {
-                fixed_numbers_board[i][j] = 1;
-                fscanf(file_descriptor, " "); /*skip whitespaces*/
-            } else {
-                fscanf(file_descriptor, " "); /*skip whitespaces*/
-            }
-        }
-    }
-}
-
-void save_board_to_file(FILE *file_descriptor) {
-    int i;
-    int j;
-    fprintf(file_descriptor, "%d", ROWS_PER_BLOCK);
-    fprintf(file_descriptor, " ");
-    fprintf(file_descriptor, "%d", COLUMNS_PER_BLOCK);
-    fprintf(file_descriptor, "\n");
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
-            fprintf(file_descriptor, "%d", game_board[i][j]);
-            if ((GAME_MODE == 1) && (game_board[i][j] != 0)) {
-                /* in Edit mode, all cells containing values are marked as "fixed" */
-                fixed_numbers_board[i][j] = 1;
-                fprintf(file_descriptor, ".");
-            } else if (fixed_numbers_board[i][j] == 1) {
-                fprintf(file_descriptor, ".");
-            }
-            fprintf(file_descriptor, " ");
-        }
-        fprintf(file_descriptor, "\n");
-    }
-}
-
-void copy_board(int **from, int **to, int save_moves) {
-    int i;
-    int j;
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
-            if (save_moves) {
-                if (from[i][j] != 0 && from[i][j] != to[i][j]) {
-                    set_cell(i, j, from[i][j]);
-                }
-            } else {
-                to[i][j] = from[i][j];
-            }
-        }
-    }
-}
-
-int check_if_board_erroneous() {
-    int i;
-    int j;
-    int number;
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
-            number = game_board[i][j];
-            if (number != 0 && !number_is_available(game_board, number, i, j, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
-                printf("number is %d, i:%d, j:%d\n", number, i, j);
-                return 1;
-            }
-        }
-    }
-    return 0;
-}
-
-
-void free_game_boards() {
-    int i;
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        free(game_board[i]);
-        free(fixed_numbers_board[i]);
-        free(erroneous_board[i]);
-        free(solved_board[i]);
-    }
-    free(game_board);
-    free(erroneous_board);
-    free(fixed_numbers_board);
-    free(solved_board);
-}
-
-void clear_moves_list() {
-    /* this function assumes game_moves has no prev value (the current move is the first move in the list) */
-    struct game_move *current;
-    while ((*game_moves).prev != NULL) {
-        game_moves = (*game_moves).prev;
-    }
-    /* now we are on the first (sentinel) move */
-    if ((*game_moves).next == NULL) {
-        free(game_moves);
-        return;
-    }
-    game_moves = (*game_moves).next;
-    while ((*game_moves).next != NULL) {
-        current = game_moves;
-        game_moves = (*game_moves).next;
-        free(current);
-    }
-}
-
-void init_game() {
-    int i;
-    int j;
-    if (GAME_ALREADY_INITIALIZED) {
-        /* making sure no memory is left allocated from the previous allocation */
-        free_game_boards();
-        clear_moves_list();
-    }
-    initialize_game_moves_list();
-    ROWS_COLUMNS_NUM = ROWS_PER_BLOCK * COLUMNS_PER_BLOCK;
-    EMPTY_CELLS_NUM = ROWS_COLUMNS_NUM * ROWS_COLUMNS_NUM;
-    game_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
-    erroneous_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
-    fixed_numbers_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
-    solved_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
-    if (game_board == NULL || erroneous_board == NULL || fixed_numbers_board == NULL || solved_board == NULL) {
-        printf("Error: game initialization failed\n");
-        exit(-1);
-    }
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        game_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
-        fixed_numbers_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
-        erroneous_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
-        solved_board[i] = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
-        if (game_board[i] == NULL || erroneous_board[i] == NULL || fixed_numbers_board[i] == NULL ||
-            solved_board[i] == NULL) {
-            printf("Error: game initialization failed\n");
-            exit(-1);
-        }
-    }
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
-            game_board[i][j] = 0;
-            fixed_numbers_board[i][j] = 0;
-            erroneous_board[i][j] = 0;
-            solved_board[i][j] = 0;
-        }
-    }
-    GAME_ALREADY_INITIALIZED = 1;
-    srand((unsigned int) time(NULL)); /* setting seed for random */
-}
-
+#include "game_moves_list.h"
+#include "game_board_operations.h"
 
 void solve(char *path) {
     /* loads the board from file */
@@ -184,7 +16,7 @@ void solve(char *path) {
         printf("Error: File doesn't exist or cannot be opened\n");
         return;
     } else {
-        read_from_file(fp);
+        read_board_from_file(fp);
     }
     fclose(fp);
 }
@@ -204,7 +36,7 @@ void edit(char *path) {
             printf("Error: File cannot be opened\n");
             return;
         } else {
-            read_from_file(fp);
+            read_board_from_file(fp);
         }
         fclose(fp);
     }
@@ -212,33 +44,6 @@ void edit(char *path) {
 
 void mark_errors(int X) {
     MARK_ERRORS = X;
-}
-
-void free_next_moves() {
-    struct game_move *current;
-    struct game_move *head;
-    current = game_moves;
-    head = game_moves;
-    while ((*current).next != NULL) {
-        current = (*current).next;
-        free(head);
-        head = current;
-    }
-}
-
-void update_moves_list(int x, int y, int z, int old) {
-    struct game_move *last_move;
-    initialize_game_moves_list();
-    last_move = game_moves;
-    free_next_moves();
-    (*game_moves).next = (struct game_move *) malloc(sizeof(struct game_move));
-    game_moves = (*game_moves).next;
-    (*game_moves).x_value = x;
-    (*game_moves).y_value = y;
-    (*game_moves).new_z_value = z;
-    (*game_moves).old_z_value = old;
-    (*game_moves).prev = last_move;
-    (*game_moves).next = NULL;
 }
 
 void set_cell(int x, int y, int z) {
@@ -254,14 +59,13 @@ void set_cell(int x, int y, int z) {
     old = game_board[x][y];
     game_board[x][y] = z;
     EMPTY_CELLS_NUM--;
-    update_moves_list(x, y, z, old);
+    update_moves_list(x, y, z, old, 0);
     if (MARK_ERRORS) {
         if (check_if_board_erroneous()) {
             erroneous_board[x][y] = 1;
         }
     }
-    print_board(game_board, fixed_numbers_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE,
-                MARK_ERRORS);
+    print_board();
     if (EMPTY_CELLS_NUM == 0 && GAME_MODE == 2) {
         if (!validate_solution()) {
             printf("Puzzle solution erroneous\n");
@@ -273,28 +77,40 @@ void set_cell(int x, int y, int z) {
     }
 }
 
-
 void undo(int print_moves) {
+    int first;
+    first = 1;
     if ((*game_moves).prev == NULL) {
         printf("Error: no moves to undo\n");
         return;
     }
-    game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
-    game_moves = (*game_moves).prev;
-    print_board(game_board, fixed_numbers_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE,
-                MARK_ERRORS);
-    if ((*(*game_moves).next).old_z_value == 0) {
-        printf("Undo %d,%d: from %d to _\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
-               (*(*game_moves).next).new_z_value);
-        EMPTY_CELLS_NUM++;
-    } else if ((*(*game_moves).next).new_z_value == 0) {
-        printf("Undo %d,%d: from _ to %d\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
-               (*(*game_moves).next).old_z_value);
-        EMPTY_CELLS_NUM--;
-    } else {
-        if (print_moves) {
-            printf("Undo %d,%d: from %d to %d\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
-                   (*(*game_moves).next).new_z_value, (*(*game_moves).next).old_z_value);
+    while ((*game_moves).generate_autofill_command > 0 || first) {
+        /* this while loop is intended to take care both of undo commands for set and of undo commands
+         * for generate and autofill */
+        first = 0;
+        game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
+        game_moves = (*game_moves).prev;
+        print_board(game_board, fixed_numbers_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE,
+                    MARK_ERRORS);
+        if ((*(*game_moves).next).old_z_value == 0) {
+            printf("Undo %d,%d: from %d to _\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
+                   (*(*game_moves).next).new_z_value);
+            EMPTY_CELLS_NUM++;
+        } else if ((*(*game_moves).next).new_z_value == 0) {
+            printf("Undo %d,%d: from _ to %d\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
+                   (*(*game_moves).next).old_z_value);
+            EMPTY_CELLS_NUM--;
+        } else {
+            if (print_moves) {
+                printf("Undo %d,%d: from %d to %d\n", (*(*game_moves).next).y_value + 1,
+                       (*(*game_moves).next).x_value + 1,
+                       (*(*game_moves).next).new_z_value, (*(*game_moves).next).old_z_value);
+            }
+        }
+        if ((*game_moves).generate_autofill_command == 2) {
+            /* we got to the sentinel */
+            game_moves = (*game_moves).prev;
+            break;
         }
     }
 }
@@ -305,6 +121,7 @@ void redo() {
         printf("Error: no moves to redo\n");
         return;
     }
+    /* TODO: change generate and autofill */
     new_value = (*(*game_moves).next).new_z_value;
     game_board[(*(*game_moves).next).x_value][(*(*game_moves).next).y_value] = new_value;
     game_moves = (*game_moves).next;
@@ -396,19 +213,6 @@ int validate_solution() {
     }
 }
 
-void clear_game_boards() {
-    int i;
-    int j;
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
-            game_board[i][j] = 0;
-            erroneous_board[i][j] = 0;
-            fixed_numbers_board[i][j] = 0;
-        }
-    }
-
-}
-
 int try_generate(int x) {
     int x_index;
     int y_index;
@@ -422,8 +226,7 @@ int try_generate(int x) {
     for (i = 0; i < x; i++) {
         x_index = rand() % ROWS_COLUMNS_NUM;
         y_index = rand() % ROWS_COLUMNS_NUM;
-        get_available_numbers_for_set(legal_values, x_index, y_index, game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK,
-                                      COLUMNS_PER_BLOCK);
+        get_available_numbers_for_set(legal_values, x_index, y_index);
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
             if (legal_values[j] > 0) {
                 count++;
@@ -435,7 +238,7 @@ int try_generate(int x) {
         }
         rand_value = rand() % count;
         j = 0;
-        while (rand_value > 0) {
+        while (rand_value == 0) {
             if (legal_values[i] == 0) {
                 count--;
             }
@@ -482,6 +285,7 @@ void generate(int x, int y) {
         y_index = rand() % ROWS_COLUMNS_NUM;
         tmp_board[x_index][y_index] = 0;
     }
+    update_moves_list(0, 0, 0, 0, 2); /* inserting sentinel to indicate this is a start of generate function */
     copy_board(tmp_board, game_board, 1);
     print_board(game_board, fixed_numbers_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE,
                 MARK_ERRORS);
@@ -521,8 +325,7 @@ void num_solutions() {
         return;
     }
     copy_board(game_board, exhaustive_board, 0);
-    ans = exhaustive_backtracking(0, 0, exhaustive_board, 0, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK,
-                                  COLUMNS_PER_BLOCK);
+    ans = exhaustive_backtracking(0, 0, exhaustive_board, 0);
     printf("Number of solutions: %d\n", ans);
     if (ans == 1) {
         printf("This is a good board!\n");
@@ -537,7 +340,6 @@ void num_solutions() {
     free(exhaustive_board);
 }
 
-
 int get_autofill_value(int x, int y) {
     int i;
     int available_number;
@@ -546,7 +348,7 @@ int get_autofill_value(int x, int y) {
     available_number = 0;
     for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
         /* iterating all possible numbers */
-        if (number_is_available(game_board, i, x, y, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK)) {
+        if (number_is_available(i, x, y)) {
             count++;
             available_number = i;
         }
@@ -557,7 +359,6 @@ int get_autofill_value(int x, int y) {
         return available_number;
     }
 }
-
 
 void autofill() {
     int i;
@@ -593,10 +394,12 @@ void autofill() {
             }
         }
     }
+    update_moves_list(0, 0, 0, 0, 2); /* inserting sentinel to indicate this is a start of generate function */
     copy_board(filled_board, game_board, 1);
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         free(filled_board[i]);
     }
+    print_board(game_board, filled_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE, MARK_ERRORS);
     free(filled_board);
 }
 
@@ -612,5 +415,4 @@ void exit_game() {
     printf("Exiting...\n");
     clear_moves_list();
     free_game_boards();
-    /* TODO: check what else should be freed here */
 }

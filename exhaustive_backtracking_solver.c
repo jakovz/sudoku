@@ -3,7 +3,6 @@
 #include "exhaustive_backtracking_solver.h"
 #include "helper_functions.h"
 
-/*TODO: credit to https://www.geeksforgeeks.org/stack-data-structure-introduction-program/*/
 struct StackNode *newNode(int rows_index, int columns_index, int current) {
     struct StackNode *stackNode = (struct StackNode *) malloc(sizeof(struct StackNode));
     (*stackNode).rows_index = rows_index;

@@ -9,6 +9,7 @@ struct game_move{
     int y_value;
     int new_z_value;
     int old_z_value;
+    int generate_autofill_command; /* 0 for non-generate, 1 for generate/autofill, 2 for generate/autofill start */
 } *game_moves;
 
 int **game_board;

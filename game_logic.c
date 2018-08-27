@@ -256,10 +256,11 @@ void set_cell(int x, int y, int z) {
     EMPTY_CELLS_NUM--;
     update_moves_list(x, y, z, old);
     if (MARK_ERRORS) {
-        if (!validate_solution()) {
+        if (check_if_board_erroneous()) {
             erroneous_board[x][y] = 1;
         }
     }
+    print_board(game_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE, MARK_ERRORS);
     if (EMPTY_CELLS_NUM == 0 && GAME_MODE == 2) {
         if (!validate_solution()) {
             printf("Puzzle solution erroneous\n");
@@ -293,6 +294,7 @@ void undo(int print_moves) {
     }
     game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
     game_moves = (*game_moves).prev;
+    print_board(game_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE, MARK_ERRORS);
 }
 
 void redo() {
@@ -317,6 +319,7 @@ void redo() {
     }
     game_board[(*(*game_moves).next).x_value][(*(*game_moves).next).y_value] = new_value;
     game_moves = (*game_moves).next;
+    print_board(game_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE, MARK_ERRORS);
 }
 
 void save_board(char *path) {

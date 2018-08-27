@@ -260,7 +260,7 @@ void set_cell(int x, int y, int z) {
             erroneous_board[x][y] = 1;
         }
     }
-    if (EMPTY_CELLS_NUM == 0) {
+    if (EMPTY_CELLS_NUM == 0 && GAME_MODE == 2) {
         if (!validate_solution()) {
             printf("Puzzle solution erroneous\n");
             return;

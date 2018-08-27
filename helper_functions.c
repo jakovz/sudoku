@@ -13,8 +13,6 @@ char *strdup(const char *s) {
     return p;
 }
 
-/* Credit: https://stackoverflow.com/questions/9210528/split-string-with-delimiters-in-c */
-/* TODO: validate that credit is needed */
 char **str_split(char *a_str, const char a_delim) {
     char **result = 0;
     size_t count = 0;

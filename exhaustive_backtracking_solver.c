@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "exhaustive_backtracking_solver.h"
-#include "helper_functions.h"
+#include "game_board_operations.h"
 
 struct StackNode *newNode(int rows_index, int columns_index, int current) {
     struct StackNode *stackNode = (struct StackNode *) malloc(sizeof(struct StackNode));
@@ -34,9 +34,7 @@ struct StackNode pop(struct StackNode **root) {
     return tmp;
 }
 
-int exhaustive_backtracking(int rows_index, int columns_index, int **game_board, int cell_current_value,
-                            int rows_columns_num,
-                            int rows_per_block, int columns_per_block) {
+int exhaustive_backtracking(int rows_index, int columns_index, int **game_board, int cell_current_value) {
     /*returns num of possible solutions to a given board (if the cell_current_value board is solvable) using an exhaustive (deterministic) backtracking algorithm*/
     int *available_numbers;
     int num_of_solutions;
@@ -72,8 +70,7 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **game_board,
                 }
                 counter = 0;
                 /* creating the actual available numbers array*/
-                get_available_numbers_for_set(available_numbers, rows_index, columns_index, game_board,
-                                              rows_columns_num, rows_per_block, columns_per_block);
+                get_available_numbers_for_set(available_numbers, rows_index, columns_index);
                 for (i = 0; i < rows_columns_num; i++) {
                     if (available_numbers[i] == 0 && (i + 1) > cell_current_value) {
                         counter++;
@@ -91,18 +88,18 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **game_board,
                     columns_index = tmp.columns_index;
                     cell_current_value = tmp.current;
                     /*initializing every cell after the one we just popped*/
-                    if((columns_index + 1) < rows_columns_num){
+                    if ((columns_index + 1) < rows_columns_num) {
                         start_row = rows_index;
-                        start_column = columns_index+1;
-                    } else if ((rows_index + 1) < rows_columns_num){
-                        start_row = rows_index+1;
+                        start_column = columns_index + 1;
+                    } else if ((rows_index + 1) < rows_columns_num) {
+                        start_row = rows_index + 1;
                         start_column = 0;
                     } else {
                         start_row = rows_columns_num;
                         start_column = rows_columns_num;
                     }
-                    for (i = start_row; i < rows_columns_num; i++){
-                        for (j = start_column; j < rows_columns_num; j++){
+                    for (i = start_row; i < rows_columns_num; i++) {
+                        for (j = start_column; j < rows_columns_num; j++) {
                             if (current_indicators_board[i][j] == 0) {
                                 game_board[i][j] = 0;
                             }

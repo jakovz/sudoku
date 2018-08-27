@@ -96,7 +96,7 @@ void get_available_numbers_for_set(int *available_numbers, int rows_index, int c
 int number_does_not_exist_in_row(int **game_board, int number, int row, int column, int rows_columns_num) {
     int i;
     for (i = 0; i < rows_columns_num; i++) {
-        if (game_board[row][i] == number && i!=column) {
+        if (game_board[row][i] == number && i != column) {
             return 0;
         }
     }
@@ -106,27 +106,28 @@ int number_does_not_exist_in_row(int **game_board, int number, int row, int colu
 int number_does_not_exist_in_column(int **game_board, int number, int row, int column, int rows_columns_num) {
     int i;
     for (i = 0; i < rows_columns_num; i++) {
-        if (game_board[i][column] == number && i!=row) {
+        if (game_board[i][column] == number && i != row) {
             return 0;
         }
     }
     return 1;
 }
 
-int number_does_not_exist_in_block(int **game_board, int number, int row, int column, int rows_per_block, int columns_per_block) {
+int number_does_not_exist_in_block(int **game_board, int number, int row, int column, int rows_per_block,
+                                   int columns_per_block) {
     int i;
     int j;
     int row_lower_bound;
     int row_upper_bound;
     int column_lower_bound;
     int column_upper_bound;
-    row_lower_bound = (row / rows_per_block)*rows_per_block;
+    row_lower_bound = (row / rows_per_block) * rows_per_block;
     row_upper_bound = row_lower_bound + rows_per_block;
-    column_lower_bound = (column / columns_per_block)*columns_per_block;
+    column_lower_bound = (column / columns_per_block) * columns_per_block;
     column_upper_bound = column_lower_bound + columns_per_block;
     for (i = row_lower_bound; i < row_upper_bound; i++) {
         for (j = column_lower_bound; j < column_upper_bound; j++) {
-            if (game_board[i][j] == number && i!=row && j!=column) {
+            if (game_board[i][j] == number && i != row && j != column) {
                 return 0;
             }
         }
@@ -134,15 +135,18 @@ int number_does_not_exist_in_block(int **game_board, int number, int row, int co
     return 1;
 }
 
-int number_is_available(int **game_board, int number, int row, int column, int rows_per_block, int columns_per_block){
-    if (number_does_not_exist_in_row(game_board, number, row, column, rows_per_block*columns_per_block) && number_does_not_exist_in_column(game_board, number, row, column, rows_per_block*columns_per_block) &&
-        number_does_not_exist_in_block(game_board, number, row, column, rows_per_block, columns_per_block)){
+int number_is_available(int **game_board, int number, int row, int column, int rows_per_block, int columns_per_block) {
+    if (number_does_not_exist_in_row(game_board, number, row, column, rows_per_block * columns_per_block) &&
+        number_does_not_exist_in_column(game_board, number, row, column, rows_per_block * columns_per_block) &&
+        number_does_not_exist_in_block(game_board, number, row, column, rows_per_block, columns_per_block)) {
         return 1;
     }
     return 0;
 }
 
-void print_board(int **board, int row_per_block, int columns_per_block, int game_mode, int mark_errors) {
+void
+print_board(int **board, int **fixed_numbers_board, int **erroneous_board, int row_per_block, int columns_per_block,
+            int game_mode, int mark_errors) {
     int i;
     int j;
     int z;

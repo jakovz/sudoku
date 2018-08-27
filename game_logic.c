@@ -6,6 +6,18 @@
 #include "ilp_solver.h"
 #include "exhaustive_backtracking_solver.h"
 
+void initialize_game_moves_list() {
+    if (game_moves == NULL) {
+        /* initializing moves list */
+        game_moves = (struct game_move *) malloc(sizeof(struct game_move));
+        (*game_moves).prev = NULL;
+        (*game_moves).next = NULL;
+        (*game_moves).y_value = 0;
+        (*game_moves).x_value = 0;
+        (*game_moves).new_z_value = 0;
+        (*game_moves).old_z_value = 0;
+    }
+}
 
 void read_from_file(FILE *file_descriptor) {
     int i;
@@ -108,6 +120,10 @@ void clear_moves_list() {
         game_moves = (*game_moves).prev;
     }
     /* now we are on the first (sentinel) move */
+    if ((*game_moves).next==NULL){
+        free(game_moves);
+        return;
+    }
     game_moves = (*game_moves).next;
     while ((*game_moves).next != NULL) {
         current = game_moves;
@@ -124,6 +140,7 @@ void init_game() {
         free_game_boards();
         clear_moves_list();
     }
+    initialize_game_moves_list();
     ROWS_COLUMNS_NUM = ROWS_PER_BLOCK * COLUMNS_PER_BLOCK;
     EMPTY_CELLS_NUM = ROWS_COLUMNS_NUM * ROWS_COLUMNS_NUM;
     game_board = malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
@@ -211,16 +228,7 @@ void free_next_moves() {
 
 void update_moves_list(int x, int y, int z, int old) {
     struct game_move *last_move;
-    if (game_moves == NULL) {
-        /* initializing moves list */
-        game_moves = (struct game_move *) malloc(sizeof(struct game_move));
-        (*game_moves).prev = NULL;
-        (*game_moves).next = NULL;
-        (*game_moves).y_value = 0;
-        (*game_moves).x_value = 0;
-        (*game_moves).new_z_value = 0;
-        (*game_moves).old_z_value = 0;
-    }
+    initialize_game_moves_list();
     last_move = game_moves;
     free_next_moves();
     (*game_moves).next = (struct game_move *) malloc(sizeof(struct game_move));
@@ -313,6 +321,8 @@ void redo() {
 
 void save_board(char *path) {
     FILE *fp;
+    int i;
+    int j;
     /*save is only available in Edit and Solve modes*/
     if ((GAME_MODE != 1) && (GAME_MODE != 2)) {
         printf("ERROR: invalid command\n");

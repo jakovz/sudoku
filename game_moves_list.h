@@ -1,7 +1,7 @@
 #ifndef SUDOKU_GAME_MOVES_LIST_H
 #define SUDOKU_GAME_MOVES_LIST_H
 
-#endif //SUDOKU_GAME_MOVES_LIST_H
+#endif /* SUDOKU_GAME_MOVES_LIST_H */
 
 struct game_move{
     struct game_move *next;

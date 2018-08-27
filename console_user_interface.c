@@ -4,6 +4,7 @@
 #include "console_user_interface.h"
 #include "game_logic.h"
 #include "helper_functions.h"
+#include "game_board_operations.h"
 
 const char *all_commands[] = {"solve", "edit", "print_board", "set", "validate", "generate", "undo", "redo",
                               "save", "num_solutions", "autofill", "hint", "mark_errors", "reset", "exit", NULL};

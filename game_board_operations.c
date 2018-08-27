@@ -256,7 +256,7 @@ void print_board() {
                     } else {
                         printf("%2d", game_board[i - rows_counter][j - columns_counter]);
                     }
-                    if (fixed_numbers_board[i - rows_counter][j - columns_counter] == 1 && game_board != 1) {
+                    if (fixed_numbers_board[i - rows_counter][j - columns_counter] == 1 && GAME_MODE != 1) {
                         /*means that this is a fixed cell*/
                         printf(".");
                     } else if (GAME_MODE == 1 || MARK_ERRORS == 1) {

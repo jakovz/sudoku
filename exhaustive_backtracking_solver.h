@@ -4,7 +4,6 @@
 #endif /* sudoku_EXHAUSTIVE_BACKTRACKING_SOLVER_H */
 
 int **current_indicators_board;
-int ROWS_COLUMNS_NUM;
 struct StackNode {
     int rows_index;
     int columns_index;

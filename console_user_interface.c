@@ -14,7 +14,7 @@ const char *edit_commands[] = {"solve", "edit", "print_board", "set", "validate"
                                "save", "num_solutions", "reset", "exit", NULL};
 const char *solve_commands[] = {"solve", "edit", "mark_errors", "print_board", "set", "validate", "undo", "redo",
                                 "save", "hint", "num_solutions", "autofill", "reset", "exit", NULL};
-const char *init_commands[] = {"solve", "edit", NULL};
+const char *init_commands[] = {"solve", "edit", "exit", NULL};
 
 
 void execute_set_cell(char **params) {

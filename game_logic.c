@@ -321,8 +321,6 @@ void redo() {
 
 void save_board(char *path) {
     FILE *fp;
-    int i;
-    int j;
     /*save is only available in Edit and Solve modes*/
     if ((GAME_MODE != 1) && (GAME_MODE != 2)) {
         printf("ERROR: invalid command\n");

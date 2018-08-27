@@ -185,7 +185,7 @@ print_board(int **board, int **fixed_numbers_board, int **erroneous_board, int r
                     } else {
                         printf("%2d", board[i - rows_counter][j - columns_counter]);
                     }
-                    if (fixed_numbers_board[i - rows_counter][j - columns_counter] == 1) {
+                    if (fixed_numbers_board[i - rows_counter][j - columns_counter] == 1 && game_mode!=1) {
                         /*means that this is a fixed cell*/
                         printf(".");
                     } else if (game_mode == 1 || mark_errors == 1) {

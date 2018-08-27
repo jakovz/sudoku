@@ -21,6 +21,7 @@ int ROWS_COLUMNS_NUM;
 int EMPTY_CELLS_NUM;
 int GAME_MODE; /* 0 - init mode, 1 - edit mode, 2 - solve mode */
 int MARK_ERRORS; /* 0 - do not mark errors, 1 - mark errors */
+int GAME_ALREADY_INITIALIZED; /* 0 - not initialized yet, 1 - already initialized */
 
 void execute_solve(char **params);
 void execute_edit(char **params);

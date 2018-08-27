@@ -77,12 +77,11 @@ void execute_mark_errors(char **params) {
 
 
 int execute_command(char *command, char **params) {
-    /* TODO: write documentation */
+    /* gets the command as a string and invokes it's corresponding function */
     if (strcmp(all_commands[0], command) == 0) {
         if (params == NULL) {
             printf("Error: invalid command\n");
             return 1;
-            /* TODO: check if this is the right treatment to solve without parameters */
         }
         solve(params[0]);
     } else if (strcmp(all_commands[1], command) == 0) {
@@ -97,7 +96,6 @@ int execute_command(char *command, char **params) {
         execute_set_cell(params);
     } else if ((strcmp(all_commands[4], command) == 0)) {
         validate_solution();
-        print_board(solved_board); /* TODO: remove */
     } else if ((strcmp(all_commands[5], command) == 0)) {
         execute_generate(params);
     } else if ((strcmp(all_commands[6], command) == 0)) {
@@ -119,7 +117,6 @@ int execute_command(char *command, char **params) {
     } else if ((strcmp(all_commands[14], command) == 0)) {
         return 0;
     } else {
-        /* TODO: check what else might cause an invalid command */
         printf("Error: invalid command\n");
     }
     return 1;
@@ -129,7 +126,6 @@ int execute_command(char *command, char **params) {
 int check_if_suitable_command(const char *commands[], char *command) {
     int i;
     i = 0;
-    /* TODO: should fix this strlen */
     while (commands[i] != NULL) {
         if (strcmp(command, commands[i]) == 0) {
             return 1;
@@ -145,6 +141,9 @@ void play_game() {
     char *parameters;
     char **splitted_params;
     int command_max_length;
+    size_t count;
+    int i;
+    count = 0;
     printf("Sudoku\n------\n");
     command_max_length = COMMAND_AND_PARAMS_SIZE;
     command_and_parameters = (char *) malloc(sizeof(char) * command_max_length);
@@ -165,7 +164,7 @@ void play_game() {
             continue;
         }
         if (parameters != NULL) {
-            splitted_params = str_split(parameters, ' ');
+            splitted_params = str_split(parameters, ' ', &count);
         } else {
             splitted_params = NULL;
         }
@@ -193,7 +192,10 @@ void play_game() {
         print_board(game_board);
         printf("Enter your command:\n");
     }
-    /* TODO: we should free more stuff here (game board etc.) */
+    for (i=0; i<count; i++){
+        free(splitted_params[i]);
+    }
+    free(splitted_params);
     free(command_and_parameters);
     exit_game();
 }

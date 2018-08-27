@@ -14,10 +14,8 @@ char *strdup(const char *s) {
 }
 
 /* Credit: https://stackoverflow.com/questions/9210528/split-string-with-delimiters-in-c */
-/* TODO: validate that credit is needed */
-char **str_split(char *a_str, const char a_delim) {
+char **str_split(char *a_str, const char a_delim, size_t *count) {
     char **result = 0;
-    size_t count = 0;
     char *tmp = a_str;
     char *last_comma = 0;
     char delim[2];
@@ -34,13 +32,13 @@ char **str_split(char *a_str, const char a_delim) {
     }
 
     /* Add space for trailing token. */
-    count += last_comma < (a_str + strlen(a_str) - 1);
+    *count += last_comma < (a_str + strlen(a_str) - 1);
 
     /* Add space for terminating null string so caller
        knows where the list of returned strings ends. */
-    count++;
+    (*count)++;
 
-    result = malloc(sizeof(char *) * count);
+    result = malloc(sizeof(char *) * (*count));
 
     if (result) {
         size_t idx = 0;

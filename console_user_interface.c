@@ -91,7 +91,7 @@ int execute_command(char *command, char **params) {
             edit(params[0]);
         }
     } else if (strcmp(all_commands[2], command) == 0) {
-        print_board(game_board);
+        print_board();
     } else if ((strcmp(all_commands[3], command) == 0)) {
         execute_set_cell(params);
     } else if ((strcmp(all_commands[4], command) == 0)) {
@@ -160,6 +160,7 @@ void play_game() {
         parameters = strtok(NULL, "\t\r\n");
         if (command == NULL) {
             /*  we ignore any kind of blank characters */
+            printf("Enter your command:\n");
             continue;
         }
         if (parameters != NULL) {

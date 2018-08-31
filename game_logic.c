@@ -19,6 +19,7 @@ void solve(char *path) {
         read_board_from_file(fp);
     }
     fclose(fp);
+    print_board();
 }
 
 void edit(char *path) {
@@ -40,6 +41,7 @@ void edit(char *path) {
         }
         fclose(fp);
     }
+    print_board();
 }
 
 void mark_errors(int X) {
@@ -90,8 +92,7 @@ void undo(int print_moves) {
         first = 0;
         game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
         game_moves = (*game_moves).prev;
-        print_board(game_board, fixed_numbers_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE,
-                    MARK_ERRORS);
+        print_board();
         if ((*(*game_moves).next).old_z_value == 0) {
             printf("Undo %d,%d: from %d to _\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
                    (*(*game_moves).next).new_z_value);
@@ -125,8 +126,7 @@ void redo() {
     new_value = (*(*game_moves).next).new_z_value;
     game_board[(*(*game_moves).next).x_value][(*(*game_moves).next).y_value] = new_value;
     game_moves = (*game_moves).next;
-    print_board(game_board, fixed_numbers_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE,
-                MARK_ERRORS);
+    print_board();
     if ((*game_moves).new_z_value == 0) {
         printf("Redo %d,%d: from %d to _\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
                (*game_moves).old_z_value);
@@ -287,8 +287,7 @@ void generate(int x, int y) {
     }
     update_moves_list(0, 0, 0, 0, 2); /* inserting sentinel to indicate this is a start of generate function */
     copy_board(tmp_board, game_board, 1);
-    print_board(game_board, fixed_numbers_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE,
-                MARK_ERRORS);
+    print_board();
 }
 
 void num_solutions() {
@@ -399,7 +398,7 @@ void autofill() {
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         free(filled_board[i]);
     }
-    print_board(game_board, filled_board, erroneous_board, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, GAME_MODE, MARK_ERRORS);
+    print_board();
     free(filled_board);
 }
 

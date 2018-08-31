@@ -14,8 +14,10 @@ char *strdup(const char *s) {
 }
 
 char **str_split(char *a_str, const char a_delim) {
+    size_t idx;
+    char *token;
     char **result = 0;
-    size_t count = 0;
+    size_t count = 0; /*TODO:remove this line only! if we decide to pass &count as a parameter to this func*/
     char *tmp = a_str;
     char *last_comma = 0;
     char delim[2];
@@ -39,25 +41,26 @@ char **str_split(char *a_str, const char a_delim) {
     count++;
 
     result = malloc(sizeof(char *) * count);
+    if (result == NULL){
+        printf("Error: str_split failed\n");
+        exit(-1);
+    }
+    idx = 0;
+    token = strtok(a_str, delim);
 
-    if (result) {
-        size_t idx = 0;
-        char *token = strtok(a_str, delim);
-
-        while (token) {
-            if (idx >= count){
-                printf("Error: parsing parameters 1 failed\n");
-                exit(-1);
-            }
-            *(result + idx++) = strdup(token);
-            token = strtok(0, delim);
-        }
-        if (idx != count - 1){
-            printf("Error: parsing parameters 2 failed\n");
+    while (token) {
+        if (idx >= count){
+            printf("Error: parsing parameters 1 failed\n");
             exit(-1);
         }
-        *(result + idx) = 0;
+        *(result + idx++) = strdup(token);
+        token = strtok(0, delim);
     }
+    if (idx != count - 1){
+        printf("Error: parsing parameters 2 failed\n");
+        exit(-1);
+    }
+    *(result + idx) = 0;
 
     return result;
 }

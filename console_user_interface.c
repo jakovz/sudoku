@@ -8,8 +8,6 @@
 
 const char *all_commands[] = {"solve", "edit", "print_board", "set", "validate", "generate", "undo", "redo",
                               "save", "num_solutions", "autofill", "hint", "mark_errors", "reset", "exit", NULL};
-
-
 const char *edit_commands[] = {"solve", "edit", "print_board", "set", "validate", "generate", "undo", "redo",
                                "save", "num_solutions", "reset", "exit", NULL};
 const char *solve_commands[] = {"solve", "edit", "mark_errors", "print_board", "set", "validate", "undo", "redo",
@@ -21,19 +19,13 @@ void execute_set_cell(char **params) {
     int set_cell_params[3];
     int i;
     char *next;
-    const char *dot;
-    dot = ".";
     for (i = 0; i < 3; i++) {
         if (params[i] != NULL) {
-            strtok(params[i], dot);
-            if (strtok(NULL, dot) != NULL){
-                /* means one of the three first parameters is not an int */
-                printf("Error: invalid command\n");
-                return;
-            }
             set_cell_params[i] = strtol(params[i], &next, 10);
-            if (next <= params[i]) {
+            if ((*next) != '\0') {
+                /* means one of the three first parameters is not an int */
                 printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
+                /* TODO: check if this is the message that should be printed */
                 return;
             }
         } else {
@@ -50,18 +42,10 @@ void execute_generate(char **params) {
     int generate_params[2];
     int i;
     char *next;
-    const char *dot;
-    dot = ".";
     for (i = 0; i < 2; i++) {
         if (params[i] != NULL) {
-            strtok(params[i], dot);
-            if (strtok(NULL, dot) != NULL){
-                /* means one of the two first parameters is not an int */
-                printf("Error: invalid command\n");
-                return;
-            }
             generate_params[i] = strtol(params[i], &next, 10);
-            if (next <= params[i]) {
+            if ((*next) != '\0') {
                 printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
                 return;
             }
@@ -87,18 +71,10 @@ void execute_get_hint(char **params) {
     int get_hint_params[2];
     int i;
     char *next;
-    const char *dot;
-    dot = ".";
     for (i = 0; i < 2; i++) {
         if (params[i] != NULL) {
-            strtok(params[i], dot);
-            if (strtok(NULL, dot) != NULL){
-                /* means one of the two first parameters is not an int */
-                printf("Error: invalid command\n");
-                return;
-            }
             get_hint_params[i] = strtol(params[i], &next, 10);
-            if (next <= params[i]) {
+            if ((*next) != '\0') {
                 printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
                 return;
             }
@@ -113,21 +89,13 @@ void execute_get_hint(char **params) {
 void execute_mark_errors(char **params) {
     int mark_errors_param;
     char *next;
-    const char *dot;
-    dot = ".";
     if (params[0] != NULL) {
-        strtok(params[0], dot);
-        if (strtok(NULL, dot) != NULL){
-            /* means the first parameter is not an int */
-            printf("Error: invalid command\n");
-            return;
-        }
         mark_errors_param = strtol(params[0], &next, 10);
     } else {
         printf("Error: invalid command\n");
         return;
     }
-    if (next <= params[0] || mark_errors_param > 1 || mark_errors_param < 0) {
+    if ((*next) != '\0' || mark_errors_param > 1 || mark_errors_param < 0) {
         printf("Error: the value should be 0 or 1\n");
         return;
     }

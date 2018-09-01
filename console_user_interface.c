@@ -206,18 +206,21 @@ void play_game() {
             if (!check_if_suitable_command(init_commands, command)) {
                 printf("ERROR: invalid command\n");
                 free_splitted_params(&splitted_params, count);
+                printf("Enter your command:\n");
                 continue;
             }
         } else if (GAME_MODE == 1) {
             if (!check_if_suitable_command(edit_commands, command)) {
                 printf("ERROR: invalid command\n");
                 free_splitted_params(&splitted_params, count);
+                printf("Enter your command:\n");
                 continue;
             }
         } else if (GAME_MODE == 2) {
             if (!check_if_suitable_command(solve_commands, command)) {
                 printf("ERROR: invalid command\n");
                 free_splitted_params(&splitted_params, count);
+                printf("Enter your command:\n");
                 continue;
             }
         }

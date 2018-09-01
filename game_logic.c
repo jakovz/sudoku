@@ -82,7 +82,7 @@ void set_cell(int x, int y, int z) {
 void undo(int print_moves) {
     int first;
     first = 1;
-    if ((*game_moves).prev == NULL) {
+    if (game_moves == NULL || (*game_moves).prev == NULL) {
         printf("Error: no moves to undo\n");
         return;
     }

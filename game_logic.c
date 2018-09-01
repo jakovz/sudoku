@@ -69,7 +69,7 @@ void set_cell(int x, int y, int z) {
     }
     print_board();
     if (EMPTY_CELLS_NUM == 0 && GAME_MODE == 2) {
-        if (!validate_solution()) {
+        if (!validate_solution(0)) {
             printf("Puzzle solution erroneous\n");
             return;
         } else {
@@ -154,7 +154,7 @@ void save_board(char *path) {
             printf("Error: board contains erroneous values\n");
             return;
         }
-        if (validate_solution() == 0) {
+        if (validate_solution(0) == 0) {
             printf("Error: board validation failed\n");
             return;
         }
@@ -200,7 +200,7 @@ void get_hint(int x, int y) {
     }
 }
 
-int validate_solution() {
+int validate_solution(int print_messages) {
     if (check_if_board_erroneous()) {
         printf("Error: board contains erroneous values\n");
         return 0;

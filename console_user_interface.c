@@ -95,7 +95,7 @@ int execute_command(char *command, char **params) {
     } else if ((strcmp(all_commands[3], command) == 0)) {
         execute_set_cell(params);
     } else if ((strcmp(all_commands[4], command) == 0)) {
-        validate_solution();
+        validate_solution(1);
     } else if ((strcmp(all_commands[5], command) == 0)) {
         execute_generate(params);
     } else if ((strcmp(all_commands[6], command) == 0)) {

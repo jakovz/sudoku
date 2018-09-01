@@ -143,6 +143,8 @@ void redo() {
 }
 
 void save_board(char *path) {
+    int i;
+    int j;
     FILE *fp;
     /*save is only available in Edit and Solve modes*/
     if ((GAME_MODE != 1) && (GAME_MODE != 2)) {
@@ -164,6 +166,14 @@ void save_board(char *path) {
         printf("Error: File cannot be created or modified\n");
         return;
     } else {
+        if (GAME_MODE == 1){
+            /*if in Edit mode: clear fixed_numbers_board (save_board_to_file marks all filled cells as fixed when in Edit mode)*/
+            for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+                for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+                    fixed_numbers_board[i][j] = 0;
+                }
+            }
+        }
         /*save game_board to file*/
         save_board_to_file(fp);
     }

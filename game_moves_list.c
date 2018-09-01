@@ -43,6 +43,7 @@ void clear_moves_list() {
     /* now we are on the first (sentinel) move */
     if ((*game_moves).next == NULL) {
         free(game_moves);
+        game_moves = NULL;
         return;
     }
     while ((*game_moves).next != NULL) {
@@ -52,6 +53,7 @@ void clear_moves_list() {
     }
     if ((*game_moves).next == NULL) {
         free(game_moves);
+        game_moves = NULL;
         return;
     }
 }

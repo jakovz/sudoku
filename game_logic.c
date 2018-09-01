@@ -54,7 +54,7 @@ void set_cell(int x, int y, int z) {
         printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
         return;
     }
-    if (fixed_numbers_board[x][y] == 1) {
+    if (fixed_numbers_board[x][y] == 1 && GAME_MODE != 1) {
         printf("Error: cell is fixed\n");
         return;
     }

@@ -130,7 +130,7 @@ int check_if_board_erroneous() {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
             number = game_board[i][j];
             if (number != 0 && !number_is_available(number, i, j)) {
-                printf("number is %d, i:%d, j:%d\n", number, i, j);
+                printf("number is %d, i:%d, j:%d\n", number, i, j); /*TODO: remove*/
                 return 1;
             }
         }

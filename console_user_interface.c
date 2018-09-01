@@ -22,9 +22,14 @@ void execute_set_cell(char **params) {
     int i;
     char *next;
     for (i = 0; i < 3; i++) {
-        set_cell_params[i] = strtol(params[i], &next, 10);
-        if (next <= params[i]) {
-            printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
+        if (params[i] != NULL) {
+            set_cell_params[i] = strtol(params[i], &next, 10);
+            if (next <= params[i]) {
+                printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
+                return;
+            }
+        } else {
+            printf("Error: invalid command\n");
             return;
         }
     }
@@ -38,17 +43,28 @@ void execute_generate(char **params) {
     int i;
     char *next;
     for (i = 0; i < 2; i++) {
-        generate_params[i] = strtol(params[i], &next, 10);
-        if (next <= params[i]) {
-            printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
+        if (params[i] != NULL) {
+            generate_params[i] = strtol(params[i], &next, 10);
+            if (next <= params[i]) {
+                printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
+                return;
+            }
+        } else {
+            printf("Error: invalid command\n");
             return;
         }
+
     }
     generate(generate_params[0], generate_params[1]);
 }
 
 void execute_save_board(char **params) {
-    save_board(params[0]);
+    if (params[0]!=NULL){
+        save_board(params[0]);
+    } else{
+        printf("Error: invalid command\n");
+        return;
+    }
 }
 
 void execute_get_hint(char **params) {
@@ -56,9 +72,14 @@ void execute_get_hint(char **params) {
     int i;
     char *next;
     for (i = 0; i < 2; i++) {
-        get_hint_params[i] = strtol(params[i], &next, 10);
-        if (next <= params[i]) {
-            printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
+        if (params[i] != NULL) {
+            get_hint_params[i] = strtol(params[i], &next, 10);
+            if (next <= params[i]) {
+                printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
+                return;
+            }
+        } else {
+            printf("Error: invalid command\n");
             return;
         }
     }
@@ -68,7 +89,12 @@ void execute_get_hint(char **params) {
 void execute_mark_errors(char **params) {
     int mark_errors_param;
     char *next;
-    mark_errors_param = strtol(params[0], &next, 10);
+    if (params[0]!=NULL){
+        mark_errors_param = strtol(params[0], &next, 10);
+    } else{
+        printf("Error: invalid command\n");
+        return;
+    }
     if (next <= params[0] || mark_errors_param > 1 || mark_errors_param < 0) {
         printf("Error: the value should be 0 or 1\n");
         return;
@@ -122,7 +148,7 @@ int execute_command(char *command, char **params) {
     return 1;
 }
 
-void free_splitted_params(char ***splitted_params, size_t count){
+void free_splitted_params(char ***splitted_params, size_t count) {
     int i;
     for (i = 0; i < (int) count; i++) {
         free((*splitted_params)[i]);

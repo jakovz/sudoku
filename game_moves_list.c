@@ -19,6 +19,8 @@ void initialize_game_moves_list() {
 void update_moves_list(int x, int y, int z, int old, int autofill_generate_value) {
     struct game_move *last_move;
     initialize_game_moves_list();
+    printf("is it here?\n");
+    fflush(stdout);
     last_move = game_moves;
     free_next_moves();
     (*game_moves).next = (struct game_move *) malloc(sizeof(struct game_move));
@@ -26,6 +28,8 @@ void update_moves_list(int x, int y, int z, int old, int autofill_generate_value
         printf("Error: could not set the move\n");
         exit(-1);
     }
+    printf("or maybe here?\n");
+    fflush(stdout);
     game_moves = (*game_moves).next;
     (*game_moves).x_value = x;
     (*game_moves).y_value = y;

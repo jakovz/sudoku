@@ -418,6 +418,8 @@ void restart_game() {
 
 void exit_game() {
     printf("Exiting...\n");
-    clear_moves_list();
-    free_game_boards();
+    if (GAME_ALREADY_INITIALIZED) {
+        clear_moves_list();
+        free_game_boards();
+    }
 }

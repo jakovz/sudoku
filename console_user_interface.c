@@ -25,7 +25,8 @@ void execute_set_cell(char **params) {
     dot = ".";
     for (i = 0; i < 3; i++) {
         if (params[i] != NULL) {
-            if (strtok(params[i], dot)!=NULL){
+            strtok(params[i], dot);
+            if (strtok(NULL, dot) != NULL){
                 /* means one of the three first parameters is not an int */
                 printf("Error: invalid command\n");
                 return;
@@ -53,7 +54,8 @@ void execute_generate(char **params) {
     dot = ".";
     for (i = 0; i < 2; i++) {
         if (params[i] != NULL) {
-            if (strtok(params[i], dot)!=NULL){
+            strtok(params[i], dot);
+            if (strtok(NULL, dot) != NULL){
                 /* means one of the two first parameters is not an int */
                 printf("Error: invalid command\n");
                 return;
@@ -89,7 +91,8 @@ void execute_get_hint(char **params) {
     dot = ".";
     for (i = 0; i < 2; i++) {
         if (params[i] != NULL) {
-            if (strtok(params[i], dot)!=NULL){
+            strtok(params[i], dot);
+            if (strtok(NULL, dot) != NULL){
                 /* means one of the two first parameters is not an int */
                 printf("Error: invalid command\n");
                 return;
@@ -113,7 +116,8 @@ void execute_mark_errors(char **params) {
     const char *dot;
     dot = ".";
     if (params[0] != NULL) {
-        if (strtok(params[0], dot)!=NULL){
+        strtok(params[0], dot);
+        if (strtok(NULL, dot) != NULL){
             /* means the first parameter is not an int */
             printf("Error: invalid command\n");
             return;

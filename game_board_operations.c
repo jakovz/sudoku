@@ -155,6 +155,7 @@ void free_game_boards() {
 void init_game() {
     int i;
     int j;
+    MARK_ERRORS = 1;
     if (GAME_ALREADY_INITIALIZED) {
         /* making sure no memory is left allocated from the previous allocation */
         free_game_boards();

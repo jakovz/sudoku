@@ -122,6 +122,14 @@ int execute_command(char *command, char **params) {
     return 1;
 }
 
+void free_splitted_params(char ***splitted_params, size_t count){
+    int i;
+    for (i = 0; i < (int) count; i++) {
+        free((*splitted_params)[i]);
+    }
+    free(*splitted_params);
+}
+
 int check_if_suitable_command(const char *commands[], char *command) {
     int i;
     i = 0;
@@ -141,7 +149,6 @@ void play_game() {
     char **splitted_params;
     int command_max_length;
     size_t count;
-    int i;
     printf("Sudoku\n------\n");
     command_max_length = COMMAND_AND_PARAMS_SIZE;
     command_and_parameters = (char *) malloc(sizeof(char) * command_max_length);
@@ -172,37 +179,31 @@ void play_game() {
         if (GAME_MODE == 0) {
             if (!check_if_suitable_command(init_commands, command)) {
                 printf("ERROR: invalid command\n");
+                free_splitted_params(&splitted_params, count);
                 continue;
             }
         } else if (GAME_MODE == 1) {
             if (!check_if_suitable_command(edit_commands, command)) {
                 printf("ERROR: invalid command\n");
+                free_splitted_params(&splitted_params, count);
                 continue;
             }
         } else if (GAME_MODE == 2) {
             if (!check_if_suitable_command(solve_commands, command)) {
                 printf("ERROR: invalid command\n");
+                free_splitted_params(&splitted_params, count);
                 continue;
             }
         }
         if (!execute_command(command, splitted_params)) {
             /* means that an exit command was given */
-            for (i = 0; i < (int) count; i++) {
-                free(splitted_params[i]);
-            }
-            free(splitted_params);
+            free_splitted_params(&splitted_params, count);
             break;
         }
-        for (i = 0; i < (int) count; i++) {
-            free(splitted_params[i]);
-        }
-        free(splitted_params);
+        free_splitted_params(&splitted_params, count);
         printf("Enter your command:\n");
     }
-    for (i = 0; i < (int) count; i++) {
-        free(splitted_params[i]);
-    }
-    free(splitted_params);
+    free_splitted_params(&splitted_params, count);
     free(command_and_parameters);
     exit_game();
 }

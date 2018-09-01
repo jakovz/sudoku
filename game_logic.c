@@ -202,13 +202,19 @@ void get_hint(int x, int y) {
 
 int validate_solution(int print_messages) {
     if (check_if_board_erroneous()) {
-        printf("Error: board contains erroneous values\n");
+        if (print_messages) {
+            printf("Error: board contains erroneous values\n");
+        }
         return 0;
     } else if (solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, 1, solved_board)) {
-        printf("Validation passed: board is solvable\n");
+        if (print_messages) {
+            printf("Validation passed: board is solvable\n");
+        }
         return 1;
     } else {
-        printf("Validation failed: board is unsolvable\n");
+        if (print_messages) {
+            printf("Validation failed: board is unsolvable\n");
+        }
         return 0;
     }
 }

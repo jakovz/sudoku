@@ -142,7 +142,6 @@ void play_game() {
     int command_max_length;
     size_t count;
     int i;
-    count = 0;
     printf("Sudoku\n------\n");
     command_max_length = COMMAND_AND_PARAMS_SIZE;
     command_and_parameters = (char *) malloc(sizeof(char) * command_max_length);
@@ -152,6 +151,7 @@ void play_game() {
     }
     printf("Enter your command:\n");
     while (fgets(command_and_parameters, command_max_length, stdin) != NULL) {
+        count = 0;
         if (strlen(command_and_parameters) == COMMAND_AND_PARAMS_SIZE) {
             /* means that the command is too long the therefore should be considered as invalid. */
             printf("ERROR: invalid command\n");
@@ -164,7 +164,7 @@ void play_game() {
             continue;
         }
         if (parameters != NULL) {
-            splitted_params = str_split(parameters, ' ');
+            splitted_params = str_split(parameters, ' ', &count);
         } else {
             splitted_params = NULL;
         }
@@ -187,8 +187,16 @@ void play_game() {
         }
         if (!execute_command(command, splitted_params)) {
             /* means that an exit command was given */
+            for (i = 0; i < (int) count; i++) {
+                free(splitted_params[i]);
+            }
+            free(splitted_params);
             break;
         }
+        for (i = 0; i < (int) count; i++) {
+            free(splitted_params[i]);
+        }
+        free(splitted_params);
         printf("Enter your command:\n");
     }
     for (i = 0; i < (int) count; i++) {

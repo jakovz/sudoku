@@ -3,5 +3,4 @@
 
 #endif /* SUDOKU_HELPER_FUNCTIONS_H */
 
-char **str_split(char *a_str, char a_delim);
-/*TODO: add declaration for char *strdup(const char *s)??*/
+char **str_split(char *a_str, char a_delim, size_t *count);

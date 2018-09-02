@@ -147,7 +147,7 @@ int execute_command(char *command, char **params) {
     } else if ((strcmp(all_commands[6], command) == 0)) {
         undo(1);
     } else if ((strcmp(all_commands[7], command) == 0)) {
-        redo();
+        redo(1);
     } else if ((strcmp(all_commands[8], command) == 0)) {
         execute_save_board(params);
     } else if ((strcmp(all_commands[9], command) == 0)) {

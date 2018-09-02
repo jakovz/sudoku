@@ -63,7 +63,7 @@ void copy_board(int **from, int **to, int save_moves) {
                     old = game_board[i][j];
                     game_board[i][j] = from[i][j];
                     EMPTY_CELLS_NUM--;
-                    update_moves_list(i, j, from[i][j], old, 1);
+                    update_moves_list(i, j, from[i][j], old, 1, 0, 0);
                 }
             } else {
                 to[i][j] = from[i][j];
@@ -163,7 +163,7 @@ int count_empty_cells() {
             }
         }
     }
-    return (ROWS_COLUMNS_NUM*ROWS_COLUMNS_NUM) - count; /* number of total cells minus the number of filled cells */
+    return (ROWS_COLUMNS_NUM * ROWS_COLUMNS_NUM) - count; /* number of total cells minus the number of filled cells */
 }
 
 void init_game() {
@@ -224,11 +224,11 @@ void clear_game_boards() {
 
 void get_available_numbers_for_set(int *available_numbers, int rows_index, int columns_index) {
     int i;
-    for (i = 1; i <=ROWS_COLUMNS_NUM; i++) {
+    for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
         if (number_is_available(i, rows_index, columns_index)) {
-            available_numbers[i-1] = 0;
+            available_numbers[i - 1] = 0;
         } else {
-            available_numbers[i-1] = 1;
+            available_numbers[i - 1] = 1;
         }
     }
 }

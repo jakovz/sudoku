@@ -15,7 +15,7 @@ void generate(int x, int y);
 int validate_solution(int print_board);
 void get_hint(int x, int y);
 void save_board(char *path);
-void redo();
+void redo(int print_moves);
 void undo(int print_moves);
 void set_cell(int x, int y, int z);
 void mark_errors(int X);

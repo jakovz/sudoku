@@ -13,10 +13,11 @@ void initialize_game_moves_list() {
         (*game_moves).new_z_value = 0;
         (*game_moves).old_z_value = 0;
         (*game_moves).generate_autofill_command = 0;
+        (*game_moves).old_value_erroneous = 0;
     }
 }
 
-void update_moves_list(int x, int y, int z, int old, int autofill_generate_value) {
+void update_moves_list(int x, int y, int z, int old, int autofill_generate_value, int old_value_erroneous, int new_value_erroneous) {
     struct game_move *last_move;
     initialize_game_moves_list();
     last_move = game_moves;
@@ -35,6 +36,8 @@ void update_moves_list(int x, int y, int z, int old, int autofill_generate_value
     (*game_moves).old_z_value = old;
     (*game_moves).generate_autofill_command = autofill_generate_value;
     (*game_moves).prev = last_move;
+    (*game_moves).old_value_erroneous = old_value_erroneous;
+    (*game_moves).new_value_erroneous = new_value_erroneous;
     (*game_moves).next = NULL;
 }
 

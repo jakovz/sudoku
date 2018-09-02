@@ -98,17 +98,25 @@ void undo(int print_moves) {
         first = 0;
         game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
         game_moves = (*game_moves).prev;
-        print_board();
+        if ((*game_moves).generate_autofill_command == 0) {
+            print_board();
+        }
         if ((*(*game_moves).next).old_z_value == 0) {
-            printf("Undo %d,%d: from %d to _\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
-                   (*(*game_moves).next).new_z_value);
+            if ((*game_moves).generate_autofill_command == 0 && print_moves) {
+                printf("Undo %d,%d: from %d to _\n", (*(*game_moves).next).y_value + 1,
+                       (*(*game_moves).next).x_value + 1,
+                       (*(*game_moves).next).new_z_value);
+            }
             EMPTY_CELLS_NUM++;
         } else if ((*(*game_moves).next).new_z_value == 0) {
-            printf("Undo %d,%d: from _ to %d\n", (*(*game_moves).next).y_value + 1, (*(*game_moves).next).x_value + 1,
-                   (*(*game_moves).next).old_z_value);
+            if ((*game_moves).generate_autofill_command == 0 && print_moves) {
+                printf("Undo %d,%d: from _ to %d\n", (*(*game_moves).next).y_value + 1,
+                       (*(*game_moves).next).x_value + 1,
+                       (*(*game_moves).next).old_z_value);
+            }
             EMPTY_CELLS_NUM--;
         } else {
-            if (print_moves) {
+            if ((*game_moves).generate_autofill_command == 0 && print_moves) {
                 printf("Undo %d,%d: from %d to %d\n", (*(*game_moves).next).y_value + 1,
                        (*(*game_moves).next).x_value + 1,
                        (*(*game_moves).next).new_z_value, (*(*game_moves).next).old_z_value);
@@ -117,6 +125,8 @@ void undo(int print_moves) {
         if ((*game_moves).generate_autofill_command == 2) {
             /* we got to the sentinel */
             game_moves = (*game_moves).prev;
+            print_board();
+            printf("All changes were undone\n");
             break;
         }
     }
@@ -269,7 +279,7 @@ int try_generate(int x) {
             }
             j++;
         }
-        game_board[x_index][y_index] = legal_values[j-1];
+        game_board[x_index][y_index] = legal_values[j - 1];
     }
     free(legal_values);
     if (!solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, 1, solved_board)) {
@@ -424,10 +434,14 @@ void autofill() {
     }
     update_moves_list(0, 0, 0, 0, 2); /* inserting sentinel to indicate this is a start of generate function */
     copy_board(filled_board, game_board, 1);
+    print_board();
+    if (EMPTY_CELLS_NUM==0){
+        printf("Puzzle solved successfully\n");
+        GAME_MODE = 0;
+    }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         free(filled_board[i]);
     }
-    print_board();
     free(filled_board);
 }
 

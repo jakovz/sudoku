@@ -54,11 +54,15 @@ char **str_split(char *a_str, const char a_delim, size_t *count) {
         *(result + idx++) = strdup(token);
         token = strtok(0, delim);
     }
-    if (idx != (*count) - 1){
+    /*
+     * if (idx != (*count) - 1){
         printf("Error: parsing parameters 2 failed\n");
         exit(-1);
     }
+     * */
+
     *(result + idx) = 0;
+    (*count) = idx;
 
     return result;
 }

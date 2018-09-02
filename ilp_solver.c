@@ -148,6 +148,7 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
 
     error = create_single_value_per_cell_constraints(model, ind, val, error, rows_columns); /* Each cell gets a value */
     if (error) goto QUIT;
+
     error = create_appear_once_in_row_constrains(model, ind, val, error,
                                                  rows_columns); /* Each value must appear once in each row */
     if (error) goto QUIT;
@@ -164,9 +165,6 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
     error = GRBoptimize(model); /* optimizing model */
     if (error) goto QUIT;
 
-    error = GRBwrite(model, "sudoku.lp");
-    if (error) goto QUIT;
-
     /* Capture solution information */
     error = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
     if (error) goto QUIT;
@@ -177,7 +175,6 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
         result = 0;
         goto QUIT;
     }
-    printf("\n");
 
     results = (double *) malloc(sizeof(double) * rows_columns * rows_columns * rows_columns);
     if (results == NULL) goto QUIT;

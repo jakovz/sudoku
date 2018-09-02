@@ -243,9 +243,9 @@ int try_generate(int x) {
     int count;
     int *legal_values;
     int rand_value;
-    count = 0;
     legal_values = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
     for (i = 0; i < x; i++) {
+        count = 0;
         x_index = rand() % ROWS_COLUMNS_NUM;
         y_index = rand() % ROWS_COLUMNS_NUM;
         get_available_numbers_for_set(legal_values, x_index, y_index);
@@ -261,7 +261,15 @@ int try_generate(int x) {
             return 0;
         }
         rand_value = rand() % count; /* randomizing a legal value */
-        game_board[x_index][y_index] = legal_values[rand_value];
+        j = 0;
+        while (rand_value != 0) {
+            /* getting the actual value out of the legal_values array */
+            if (legal_values[j] == 0) {
+                rand_value--;
+            }
+            j++;
+        }
+        game_board[x_index][y_index] = legal_values[j-1];
     }
     free(legal_values);
     if (!solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, 1, solved_board)) {
@@ -304,6 +312,10 @@ void generate(int x, int y) {
     }
     update_moves_list(0, 0, 0, 0, 2); /* inserting sentinel to indicate this is a start of generate function */
     copy_board(tmp_board, game_board, 1);
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        free(tmp_board[i]);
+    }
+    free(tmp_board);
     print_board();
 }
 

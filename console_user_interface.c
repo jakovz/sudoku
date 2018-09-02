@@ -150,10 +150,12 @@ int execute_command(char *command, char **params) {
 
 void free_splitted_params(char ***splitted_params, size_t count) {
     int i;
-    for (i = 0; i < (int) count; i++) {
-        free((*splitted_params)[i]);
+    if ((*splitted_params)!=NULL){
+        for (i = 0; i < (int) count; i++) {
+            free((*splitted_params)[i]);
+        }
+        free(*splitted_params);
     }
-    free(*splitted_params);
 }
 
 int check_if_suitable_command(const char *commands[], char *command) {
@@ -175,6 +177,8 @@ void play_game() {
     char **splitted_params;
     int command_max_length;
     size_t count;
+    count = 0;
+    splitted_params = NULL;
     printf("Sudoku\n------\n");
     command_max_length = COMMAND_AND_PARAMS_SIZE;
     command_and_parameters = (char *) malloc(sizeof(char) * command_max_length);

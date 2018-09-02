@@ -151,6 +151,21 @@ void free_game_boards() {
     free(solved_board);
 }
 
+int count_empty_cells() {
+    int i;
+    int j;
+    int count;
+    count = 0;
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            if (game_board[i][j] != 0) {
+                count++;
+            }
+        }
+    }
+    return (ROWS_COLUMNS_NUM*ROWS_COLUMNS_NUM) - count; /* number of total cells minus the number of filled cells */
+}
+
 void init_game() {
     int i;
     int j;
@@ -209,11 +224,11 @@ void clear_game_boards() {
 
 void get_available_numbers_for_set(int *available_numbers, int rows_index, int columns_index) {
     int i;
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+    for (i = 1; i <=ROWS_COLUMNS_NUM; i++) {
         if (number_is_available(i, rows_index, columns_index)) {
-            available_numbers[i] = 0;
+            available_numbers[i-1] = 0;
         } else {
-            available_numbers[i] = 1;
+            available_numbers[i-1] = 1;
         }
     }
 }

@@ -28,3 +28,4 @@ int check_if_board_erroneous();
 void free_game_boards();
 void get_available_numbers_for_set(int *available_numbers, int rows_index, int columns_index);
 void print_board();
+int count_empty_cells();

@@ -19,6 +19,7 @@ void solve(char *path) {
         read_board_from_file(fp);
     }
     fclose(fp);
+    EMPTY_CELLS_NUM = count_empty_cells();
     print_board();
 }
 
@@ -41,6 +42,7 @@ void edit(char *path) {
         }
         fclose(fp);
     }
+    EMPTY_CELLS_NUM = count_empty_cells();
     print_board();
 }
 
@@ -60,7 +62,11 @@ void set_cell(int x, int y, int z) {
     }
     old = game_board[x][y];
     game_board[x][y] = z;
-    EMPTY_CELLS_NUM--;
+    if (z != 0) {
+        EMPTY_CELLS_NUM--;
+    } else {
+        EMPTY_CELLS_NUM++;
+    }
     update_moves_list(x, y, z, old, 0);
     if (MARK_ERRORS) {
         if (check_if_board_erroneous()) {
@@ -166,7 +172,7 @@ void save_board(char *path) {
         printf("Error: File cannot be created or modified\n");
         return;
     } else {
-        if (GAME_MODE == 1){
+        if (GAME_MODE == 1) {
             /*if in Edit mode: clear fixed_numbers_board (save_board_to_file marks all filled cells as fixed when in Edit mode)*/
             for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
                 for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
@@ -244,23 +250,18 @@ int try_generate(int x) {
         y_index = rand() % ROWS_COLUMNS_NUM;
         get_available_numbers_for_set(legal_values, x_index, y_index);
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
-            if (legal_values[j] > 0) {
+            if (legal_values[j] == 0) {
                 count++;
             }
         }
         if (count == 0) {
+            /* no legal values available for this cell */
             clear_game_boards();
+            free(legal_values);
             return 0;
         }
-        rand_value = rand() % count;
-        j = 0;
-        while (rand_value == 0) {
-            if (legal_values[i] == 0) {
-                count--;
-            }
-            j++;
-        }
-        game_board[x_index][y_index] = legal_values[j];
+        rand_value = rand() % count; /* randomizing a legal value */
+        game_board[x_index][y_index] = legal_values[rand_value];
     }
     free(legal_values);
     if (!solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, 1, solved_board)) {

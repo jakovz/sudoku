@@ -19,6 +19,10 @@ void execute_set_cell(char **params) {
     int set_cell_params[3];
     int i;
     char *next;
+    if (params==NULL){
+        printf("Error: invalid command\n");
+        return;
+    }
     for (i = 0; i < 3; i++) {
         if (params[i] != NULL) {
             set_cell_params[i] = strtol(params[i], &next, 10);
@@ -42,6 +46,10 @@ void execute_generate(char **params) {
     int generate_params[2];
     int i;
     char *next;
+    if (params==NULL){
+        printf("Error: invalid command\n");
+        return;
+    }
     for (i = 0; i < 2; i++) {
         if (params[i] != NULL) {
             generate_params[i] = strtol(params[i], &next, 10);
@@ -59,6 +67,10 @@ void execute_generate(char **params) {
 }
 
 void execute_save_board(char **params) {
+    if (params==NULL){
+        printf("Error: invalid command\n");
+        return;
+    }
     if (params[0] != NULL) {
         save_board(params[0]);
     } else {
@@ -71,6 +83,10 @@ void execute_get_hint(char **params) {
     int get_hint_params[2];
     int i;
     char *next;
+    if (params==NULL){
+        printf("Error: invalid command\n");
+        return;
+    }
     for (i = 0; i < 2; i++) {
         if (params[i] != NULL) {
             get_hint_params[i] = strtol(params[i], &next, 10);
@@ -89,6 +105,10 @@ void execute_get_hint(char **params) {
 void execute_mark_errors(char **params) {
     int mark_errors_param;
     char *next;
+    if (params==NULL){
+        printf("Error: invalid command\n");
+        return;
+    }
     if (params[0] != NULL) {
         mark_errors_param = strtol(params[0], &next, 10);
     } else {
@@ -105,13 +125,13 @@ void execute_mark_errors(char **params) {
 int execute_command(char *command, char **params) {
     /* gets the command as a string and invokes it's corresponding function */
     if (strcmp(all_commands[0], command) == 0) {
-        if (params == NULL) {
+        if (params == NULL || params[0]==NULL) {
             printf("Error: invalid command\n");
             return 1;
         }
         solve(params[0]);
     } else if (strcmp(all_commands[1], command) == 0) {
-        if (params == NULL) {
+        if (params == NULL || params[0]==NULL) {
             edit(NULL);
         } else {
             edit(params[0]);

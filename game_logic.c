@@ -102,9 +102,20 @@ void undo(int print_moves) {
         /* this while loop is intended to take care both of undo commands for set and of undo commands
          * for generate and autofill */
         first = 0;
+        if ((*game_moves).generate_autofill_command == 3) {
+            /* it's a sentinel */
+            game_moves = (*game_moves).prev;
+            continue;
+        }
         game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
         erroneous_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_value_erroneous;
         game_moves = (*game_moves).prev;
+        if ((*game_moves).generate_autofill_command == 2) {
+            /* we got to the sentinel */
+            print_board();
+            printf("All recent changes were undone\n");
+            break;
+        }
         if ((*(*game_moves).next).generate_autofill_command == 0) {
             /* we print the board only if it was a set command */
             print_board();
@@ -130,13 +141,9 @@ void undo(int print_moves) {
                        (*(*game_moves).next).new_z_value, (*(*game_moves).next).old_z_value);
             }
         }
-        if ((*game_moves).generate_autofill_command == 2) {
-            /* we got to the sentinel */
-            game_moves = (*game_moves).prev;
-            print_board();
-            printf("All recent changes were undone\n");
-            break;
-        }
+        printf("Undo %d,%d: from %d to %d\n", (*(*game_moves).next).y_value + 1,
+               (*(*game_moves).next).x_value + 1,
+               (*(*game_moves).next).new_z_value, (*(*game_moves).next).old_z_value);
     }
 }
 
@@ -148,11 +155,22 @@ void redo(int print_moves) {
         printf("Error: no moves to redo\n");
         return;
     }
-    while ((*game_moves).generate_autofill_command == 1 || first) {
+    while ((*game_moves).generate_autofill_command == 1 || (*game_moves).generate_autofill_command == 2 || first) {
         first = 0;
+        if ((*game_moves).generate_autofill_command == 2) {
+            /* its a sentinel */
+            game_moves = (*game_moves).next;
+            continue;
+        }
         game_board[(*(*game_moves).next).x_value][(*(*game_moves).next).y_value] = (*(*game_moves).next).new_z_value;
         erroneous_board[(*(*game_moves).next).x_value][(*(*game_moves).next).y_value] = (*(*game_moves).next).new_value_erroneous;
         game_moves = (*game_moves).next;
+        if ((*game_moves).generate_autofill_command == 3) {
+            /* we got to the sentinel */
+            print_board();
+            printf("All recent changes were redone\n");
+            break;
+        }
         if ((*game_moves).generate_autofill_command == 0) {
             print_board();
         }
@@ -175,15 +193,9 @@ void redo(int print_moves) {
                        (*game_moves).old_z_value);
             }
         }
-        if ((*game_moves).generate_autofill_command == 3) {
-            /* we got to the sentinel */
-            if ((*game_moves).next != NULL) {
-                game_moves = (*game_moves).next;
-            }
-            print_board();
-            printf("All recent changes were redone\n");
-            break;
-        }
+        printf("Redo %d,%d: from %d to %d\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
+               (*game_moves).new_z_value,
+               (*game_moves).old_z_value);
     }
 }
 
@@ -282,7 +294,12 @@ int try_generate(int x) {
     int count;
     int *legal_values;
     int rand_value;
-    legal_values = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+    int second_count;
+    legal_values = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+    if (legal_values == NULL) {
+        printf("Error: error generating board\n");
+        exit(-1);
+    }
     for (i = 0; i < x; i++) {
         count = 0;
         x_index = rand() % ROWS_COLUMNS_NUM;
@@ -299,12 +316,13 @@ int try_generate(int x) {
             free(legal_values);
             return 0;
         }
-        rand_value = rand() % count; /* randomizing a legal value */
+        rand_value = (rand() % count) + 1; /* randomizing a legal value */
         j = 0;
-        while (rand_value != 0) {
+        second_count = 0;
+        while (rand_value!=second_count) {
             /* getting the actual value out of the legal_values array */
             if (legal_values[j] == 0) {
-                rand_value--;
+                second_count++;
             }
             j++;
         }

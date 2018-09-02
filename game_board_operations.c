@@ -76,6 +76,9 @@ int number_does_not_exist_in_row(int number, int row, int column) {
     int i;
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         if (game_board[row][i] == number && i != column) {
+            erroneous_board[row][i] = 1;
+            /*in order to mark all erroneous cells as so*/
+            erroneous_board[row][column] = 1;
             return 0;
         }
     }
@@ -86,6 +89,8 @@ int number_does_not_exist_in_column(int number, int row, int column) {
     int i;
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         if (game_board[i][column] == number && i != row) {
+            erroneous_board[i][column] = 1;
+            erroneous_board[row][column] = 1; /*in order to mark all erroneous cells as so*/
             return 0;
         }
     }
@@ -102,10 +107,12 @@ int number_does_not_exist_in_block(int number, int row, int column) {
     row_lower_bound = (row / ROWS_PER_BLOCK) * ROWS_PER_BLOCK;
     row_upper_bound = row_lower_bound + ROWS_PER_BLOCK;
     column_lower_bound = (column / COLUMNS_PER_BLOCK) * COLUMNS_PER_BLOCK;
-    column_upper_bound = column_lower_bound + ROWS_PER_BLOCK;
+    column_upper_bound = column_lower_bound + COLUMNS_PER_BLOCK;
     for (i = row_lower_bound; i < row_upper_bound; i++) {
         for (j = column_lower_bound; j < column_upper_bound; j++) {
             if (game_board[i][j] == number && i != row && j != column) {
+                erroneous_board[i][j] = 1;
+                erroneous_board[row][column] = 1; /*in order to mark all erroneous cells as so*/
                 return 0;
             }
         }

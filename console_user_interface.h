@@ -5,4 +5,8 @@
 
 #define COMMAND_AND_PARAMS_SIZE 257
 
+/* the function play_game executes the user's commands throughout the game.
+ * input: none
+ * output: no return value
+ */
 void play_game();

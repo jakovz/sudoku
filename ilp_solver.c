@@ -104,6 +104,10 @@ void allocate_ilp_variables(int **ind, double **val, double **lb, char **vtype, 
     (*val) = (double *) malloc(rows_columns * sizeof(double));
     (*lb) = (double *) malloc(rows_columns * rows_columns * rows_columns * sizeof(double));
     (*vtype) = (char *) malloc(rows_columns * rows_columns * rows_columns * sizeof(char));
+    if ((*ind)==NULL || (*val)==NULL || (*lb)==NULL || (*vtype)==NULL){
+        printf("Error: ILP has failed\n");
+        exit(-1);
+    }
 }
 
 
@@ -197,7 +201,7 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
     QUIT:
     if (error) {
         printf("ERROR: %s\n", GRBgeterrormsg(env)); /* reporting the error */
-        return 0;
+        exit(-1);
     }
     free(results);
     free_ilp_variables(&ind, &val, &lb, &vtype);

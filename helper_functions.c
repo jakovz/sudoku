@@ -6,6 +6,10 @@
 char *strdup(const char *s) {
     size_t size = strlen(s) + 1;
     char *p = malloc(size);
+    if (p == NULL) {
+        printf("Error: strdup has failed\n");
+        exit(-1);
+    }
     if (p) {
         memcpy(p, s, size);
     }
@@ -39,7 +43,7 @@ char **str_split(char *a_str, const char a_delim, size_t *count) {
     (*count)++;
 
     result = malloc(sizeof(char *) * (*count));
-    if (result == NULL){
+    if (result == NULL) {
         printf("Error: str_split failed\n");
         exit(-1);
     }
@@ -47,7 +51,7 @@ char **str_split(char *a_str, const char a_delim, size_t *count) {
     token = strtok(a_str, delim);
 
     while (token) {
-        if (idx >= (*count)){
+        if (idx >= (*count)) {
             printf("Error: parsing parameters 1 failed\n");
             exit(-1);
         }

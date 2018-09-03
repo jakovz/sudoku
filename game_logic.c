@@ -339,9 +339,17 @@ void generate(int x, int y) {
     int **second_tmp_board;
     tmp_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
     second_tmp_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
+    if (tmp_board == NULL || second_tmp_board == NULL) {
+        printf("Error: generate has failed\n");
+        exit(-1);
+    }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         tmp_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         second_tmp_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+        if (tmp_board[i] == NULL || second_tmp_board[i] == NULL) {
+            printf("Error: generate has failed\n");
+            exit(-1);
+        }
     }
     /* initializing values */
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
@@ -421,14 +429,14 @@ void num_solutions() {
     exhaustive_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
     current_indicators_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
     if (current_indicators_board == NULL || exhaustive_board == NULL) {
-        printf("Error: num_solutions failed\n");
+        printf("Error: num_solutions has failed\n");
         exit(-1);
     }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         current_indicators_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         exhaustive_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
         if (current_indicators_board[i] == NULL || exhaustive_board[i] == NULL) {
-            printf("Error: num_solutions failed\n");
+            printf("Error: num_solutions has failed\n");
             exit(-1);
         }
     }

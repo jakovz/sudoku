@@ -202,7 +202,7 @@ void play_game() {
     printf("Sudoku\n------\n");
     command_max_length = COMMAND_AND_PARAMS_SIZE;
     command_and_parameters = (char *) malloc(sizeof(char) * command_max_length);
-    if (!command_and_parameters) {
+    if (command_and_parameters==NULL) {
         printf("Error: play_game() has failed\n");
         exit(-1);
     }

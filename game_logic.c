@@ -55,7 +55,6 @@ void set_cell(int x, int y, int z) {
     int new_is_erroneous;
     int old_is_erroneous;
     new_is_erroneous = 0;
-    old_is_erroneous = erroneous_board[x][y];
     if (x < 0 || y < 0 || x >= ROWS_COLUMNS_NUM || y >= ROWS_COLUMNS_NUM || z < 0 || z > ROWS_COLUMNS_NUM) {
         printf("Error: value not in range 0-%d\n", ROWS_COLUMNS_NUM);
         return;
@@ -64,6 +63,7 @@ void set_cell(int x, int y, int z) {
         printf("Error: cell is fixed\n");
         return;
     }
+    old_is_erroneous = erroneous_board[x][y];
     old = game_board[x][y];
     game_board[x][y] = z;
     if (z != 0) {
@@ -113,8 +113,10 @@ void undo(int print_moves) {
         if ((*game_moves).generate_autofill_command == 2) {
             /* we got to the sentinel */
             game_moves = (*game_moves).prev;
-            print_board();
-            printf("All recent changes were undone\n");
+            if (print_moves) {
+                print_board();
+                printf("All recent changes were undone\n");
+            }
             break;
         }
         if ((*(*game_moves).next).generate_autofill_command == 0) {
@@ -158,8 +160,10 @@ void redo(int print_moves) {
         if ((*(*game_moves).next).generate_autofill_command == 3) {
             /* we got to the sentinel */
             game_moves = (*game_moves).next;
-            print_board();
-            printf("All recent changes were redone\n");
+            if (print_moves) {
+                print_board();
+                printf("All recent changes were redone\n");
+            }
             break;
         }
         game_board[(*(*game_moves).next).x_value][(*(*game_moves).next).y_value] = (*(*game_moves).next).new_z_value;
@@ -328,19 +332,41 @@ int try_generate(int x) {
 
 void generate(int x, int y) {
     int i;
+    int j;
     int x_index;
     int y_index;
     int **tmp_board;
+    int **second_tmp_board;
     tmp_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
+    second_tmp_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         tmp_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+        second_tmp_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+    }
+    /* initializing values */
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            second_tmp_board[i][j] = 0;
+        }
     }
     if (EMPTY_CELLS_NUM < ROWS_COLUMNS_NUM * ROWS_COLUMNS_NUM) {
         printf("Error: board is not empty\n");
+        for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+            free(tmp_board[i]);
+            free(second_tmp_board[i]);
+        }
+        free(second_tmp_board);
+        free(tmp_board);
         return;
     }
     if (x > EMPTY_CELLS_NUM || y > EMPTY_CELLS_NUM) {
         printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
+        for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+            free(tmp_board[i]);
+            free(second_tmp_board[i]);
+        }
+        free(second_tmp_board);
+        free(tmp_board);
         return;
     }
     i = 0;
@@ -349,6 +375,12 @@ void generate(int x, int y) {
     }
     if (i >= 1000) {
         printf("Error: puzzle generator failed\n");
+        for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+            free(tmp_board[i]);
+            free(second_tmp_board[i]);
+        }
+        free(second_tmp_board);
+        free(tmp_board);
         return;
     }
     /* if the program got here, it means that the board was generated successfully */
@@ -356,14 +388,27 @@ void generate(int x, int y) {
     for (i = 0; i < y; i++) {
         x_index = rand() % ROWS_COLUMNS_NUM;
         y_index = rand() % ROWS_COLUMNS_NUM;
-        tmp_board[x_index][y_index] = 0;
+        second_tmp_board[x_index][y_index] = 1;
     }
-    update_moves_list(0, 0, 0, 0, 2, 0, 0); /* inserting sentinel to indicate this is a start of generate function */
-    copy_board(tmp_board, game_board, 1);
-    update_moves_list(0, 0, 0, 0, 3, 0, 0); /* inserting sentinel to indicate this is the end of generate function */
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            if (second_tmp_board[i][j] != 1) {
+                tmp_board[i][j] = 0;
+            }
+        }
+    }
+    if (y != 0) {
+        update_moves_list(0, 0, 0, 0, 2, 0,
+                          0); /* inserting sentinel to indicate this is a start of generate function */
+        copy_board(tmp_board, game_board, 1);
+        update_moves_list(0, 0, 0, 0, 3, 0,
+                          0); /* inserting sentinel to indicate this is the end of generate function */
+    }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         free(tmp_board[i]);
+        free(second_tmp_board[i]);
     }
+    free(second_tmp_board);
     free(tmp_board);
     print_board();
 }
@@ -440,8 +485,10 @@ int get_autofill_value(int x, int y) {
 void autofill() {
     int i;
     int j;
+    int count;
     int new_value;
     int **filled_board;
+    count = 0;
     if (check_if_board_erroneous()) {
         printf("Error: board contains erroneous values\n");
         return;
@@ -467,13 +514,18 @@ void autofill() {
                     /* means that there is an autofill option */
                     filled_board[i][j] = new_value; /* we do not want the new values to affect autofill. */
                     printf("Cell <%d,%d> set to %d\n", i, j, new_value);
+                    count++;
                 }
             }
         }
     }
-    update_moves_list(0, 0, 0, 0, 2, 0, 0); /* inserting sentinel to indicate this is a start of generate function */
-    copy_board(filled_board, game_board, 1);
-    update_moves_list(0, 0, 0, 0, 3, 0, 0); /* inserting sentinel to indicate this is the end of autofill function */
+    if (count != 0) {
+        update_moves_list(0, 0, 0, 0, 2, 0,
+                          0); /* inserting sentinel to indicate this is a start of generate function */
+        copy_board(filled_board, game_board, 1);
+        update_moves_list(0, 0, 0, 0, 3, 0,
+                          0); /* inserting sentinel to indicate this is the end of autofill function */
+    }
     print_board();
     if (EMPTY_CELLS_NUM == 0) {
         printf("Puzzle solved successfully\n");
@@ -490,6 +542,7 @@ void restart_game() {
         undo(0);
     }
     clear_moves_list();
+    initialize_game_moves_list();
     printf("Board reset\n");
 }
 

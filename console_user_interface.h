@@ -6,4 +6,3 @@
 #define COMMAND_AND_PARAMS_SIZE 257
 
 void play_game();
-/*void print_board(int *board[]);*/ /*TODO msg4jay: removed cuz print_board is declared in game_board_operations.h*/

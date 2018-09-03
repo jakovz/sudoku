@@ -82,8 +82,8 @@ create_appear_once_in_block_constrains(GRBmodel *model, int *ind, double *val, i
                                        int rows_per_block, int columns_per_block) {
     int v, i, j, ig, jg;
     for (v = 0; v < rows_columns; v++) {
-        for (ig = 0; ig < rows_per_block; ig++) {
-            for (jg = 0; jg < columns_per_block; jg++) {
+        for (jg = 0; jg < rows_per_block; jg++) {
+            for (ig = 0; ig < columns_per_block; ig++) {
                 count = 0;
                 for (i = ig * rows_per_block; i < (ig + 1) * rows_per_block; i++) {
                     for (j = jg * columns_per_block; j < (jg + 1) * columns_per_block; j++) {

@@ -110,6 +110,13 @@ void undo(int print_moves) {
         game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
         erroneous_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_value_erroneous;
         game_moves = (*game_moves).prev;
+        if ((*game_moves).generate_autofill_command == 2) {
+            /* we got to the sentinel */
+            game_moves = (*game_moves).prev;
+            print_board();
+            printf("All recent changes were undone\n");
+            break;
+        }
         if ((*(*game_moves).next).generate_autofill_command == 0) {
             /* we print the board only if it was a set command */
             print_board();
@@ -135,12 +142,6 @@ void undo(int print_moves) {
                        (*(*game_moves).next).new_z_value, (*(*game_moves).next).old_z_value);
             }
         }
-        if ((*game_moves).generate_autofill_command == 2) {
-            /* we got to the sentinel */
-            print_board();
-            printf("All recent changes were undone\n");
-            break;
-        }
     }
 }
 
@@ -156,6 +157,7 @@ void redo(int print_moves) {
         first = 0;
         if ((*(*game_moves).next).generate_autofill_command == 3) {
             /* we got to the sentinel */
+            game_moves = (*game_moves).next;
             print_board();
             printf("All recent changes were redone\n");
             break;

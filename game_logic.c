@@ -73,7 +73,7 @@ void set_cell(int x, int y, int z) {
     }
     if (MARK_ERRORS) {
         if (check_if_board_erroneous()) {
-            erroneous_board[x][y] = 1;
+            //erroneous_board[x][y] = 1;
             new_is_erroneous = 1;
         }
     }

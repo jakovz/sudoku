@@ -74,32 +74,35 @@ void copy_board(int **from, int **to, int save_moves) {
 
 int number_does_not_exist_in_row(int number, int row, int column) {
     int i;
+    int flag = 1;
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         if (game_board[row][i] == number && i != column) {
             erroneous_board[row][i] = 1;
             /*in order to mark all erroneous cells as so*/
             erroneous_board[row][column] = 1;
-            return 0;
+            flag = 0;
         }
     }
-    return 1;
+    return flag;
 }
 
 int number_does_not_exist_in_column(int number, int row, int column) {
     int i;
+    int flag = 1;
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         if (game_board[i][column] == number && i != row) {
             erroneous_board[i][column] = 1;
             erroneous_board[row][column] = 1; /*in order to mark all erroneous cells as so*/
-            return 0;
+            flag = 0;
         }
     }
-    return 1;
+    return flag;
 }
 
 int number_does_not_exist_in_block(int number, int row, int column) {
     int i;
     int j;
+    int flag = 1;
     int row_lower_bound;
     int row_upper_bound;
     int column_lower_bound;
@@ -113,35 +116,50 @@ int number_does_not_exist_in_block(int number, int row, int column) {
             if (game_board[i][j] == number && i != row && j != column) {
                 erroneous_board[i][j] = 1;
                 erroneous_board[row][column] = 1; /*in order to mark all erroneous cells as so*/
-                return 0;
+                flag = 0;
             }
         }
     }
-    return 1;
+    return flag;
 }
 
 int number_is_available(int number, int row, int column) {
-    if (number_does_not_exist_in_row(number, row, column) &&
+    int isAvailable = 1;
+    if (!(number_does_not_exist_in_row(number, row, column))) {
+        isAvailable = 0;
+    }
+    if (!(number_does_not_exist_in_column(number, row, column))) {
+        isAvailable = 0;
+    }
+    if (!(number_does_not_exist_in_block(number, row, column))) {
+        isAvailable = 0;
+    }
+    return isAvailable;
+
+    /*
+     * if (number_does_not_exist_in_row(number, row, column) &&
         number_does_not_exist_in_column(number, row, column) &&
         number_does_not_exist_in_block(number, row, column)) {
         return 1;
     }
     return 0;
+     * */
 }
 
 int check_if_board_erroneous() {
     int i;
     int j;
     int number;
+    int flag = 0;
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
             number = game_board[i][j];
             if (number != 0 && !number_is_available(number, i, j)) {
-                return 1;
+                flag = 1;
             }
         }
     }
-    return 0;
+    return flag;
 }
 
 void free_game_boards() {

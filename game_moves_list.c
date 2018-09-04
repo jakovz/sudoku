@@ -14,6 +14,7 @@ void initialize_game_moves_list() {
         (*game_moves).old_z_value = 0;
         (*game_moves).generate_autofill_command = 0;
         (*game_moves).old_value_erroneous = 0;
+        (*game_moves).new_value_erroneous = 0;
     }
 }
 

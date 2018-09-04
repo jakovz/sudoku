@@ -5,5 +5,8 @@
 
 #define COMMAND_AND_PARAMS_SIZE 257
 
+/* the function play_game executes the user's commands throughout the game.
+ * input: none
+ * output: no return value
+ */
 void play_game();
-/*void print_board(int *board[]);*/ /*TODO msg4jay: removed cuz print_board is declared in game_board_operations.h*/

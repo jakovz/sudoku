@@ -5,6 +5,10 @@
 
 struct StackNode *newNode(int rows_index, int columns_index, int current) {
     struct StackNode *stackNode = (struct StackNode *) malloc(sizeof(struct StackNode));
+    if (stackNode==NULL){
+        printf("Error: num_solutions failed\n");
+        exit(-1);
+    }
     (*stackNode).rows_index = rows_index;
     (*stackNode).columns_index = columns_index;
     (*stackNode).current = current;

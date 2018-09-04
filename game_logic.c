@@ -73,7 +73,6 @@ void set_cell(int x, int y, int z) {
     }
     if (MARK_ERRORS) {
         if (check_if_board_erroneous()) {
-            //erroneous_board[x][y] = 1;
             new_is_erroneous = 1;
         }
     }
@@ -478,7 +477,7 @@ int get_autofill_value(int x, int y) {
     available_number = 0;
     for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
         /* iterating all possible numbers */
-        if (number_is_available(i, x, y)) {
+        if (number_is_available(i, x, y, 0)) {
             count++;
             available_number = i;
         }

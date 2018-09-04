@@ -72,34 +72,44 @@ void copy_board(int **from, int **to, int save_moves) {
     }
 }
 
-int number_does_not_exist_in_row(int number, int row, int column) {
+int number_does_not_exist_in_row(int number, int row, int column, int mark_as_erroneous) {
     int i;
     int flag = 1;
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         if (game_board[row][i] == number && i != column) {
-            erroneous_board[row][i] = 1;
-            /*in order to mark all erroneous cells as so*/
-            erroneous_board[row][column] = 1;
-            flag = 0;
+            if (mark_as_erroneous) {
+                erroneous_board[row][i] = 1;
+                /*in order to mark all erroneous cells as so*/
+                erroneous_board[row][column] = 1;
+                flag = 0;
+            } else{
+                flag = 0;
+                return flag;
+            }
         }
     }
     return flag;
 }
 
-int number_does_not_exist_in_column(int number, int row, int column) {
+int number_does_not_exist_in_column(int number, int row, int column, int mark_as_erroneous) {
     int i;
     int flag = 1;
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         if (game_board[i][column] == number && i != row) {
-            erroneous_board[i][column] = 1;
-            erroneous_board[row][column] = 1; /*in order to mark all erroneous cells as so*/
-            flag = 0;
+            if (mark_as_erroneous) {
+                erroneous_board[i][column] = 1;
+                erroneous_board[row][column] = 1; /*in order to mark all erroneous cells as so*/
+                flag = 0;
+            } else{
+                flag = 0;
+                return flag;
+            }
         }
     }
     return flag;
 }
 
-int number_does_not_exist_in_block(int number, int row, int column) {
+int number_does_not_exist_in_block(int number, int row, int column, int mark_as_erroneous) {
     int i;
     int j;
     int flag = 1;
@@ -114,24 +124,29 @@ int number_does_not_exist_in_block(int number, int row, int column) {
     for (i = row_lower_bound; i < row_upper_bound; i++) {
         for (j = column_lower_bound; j < column_upper_bound; j++) {
             if (game_board[i][j] == number && i != row && j != column) {
-                erroneous_board[i][j] = 1;
-                erroneous_board[row][column] = 1; /*in order to mark all erroneous cells as so*/
-                flag = 0;
+                if (mark_as_erroneous) {
+                    erroneous_board[i][j] = 1;
+                    erroneous_board[row][column] = 1; /*in order to mark all erroneous cells as so*/
+                    flag = 0;
+                } else{
+                    flag = 0;
+                    return flag;
+                }
             }
         }
     }
     return flag;
 }
 
-int number_is_available(int number, int row, int column) {
+int number_is_available(int number, int row, int column, int mark_as_erroneous) {
     int isAvailable = 1;
-    if (!(number_does_not_exist_in_row(number, row, column))) {
+    if (!(number_does_not_exist_in_row(number, row, column, mark_as_erroneous))) {
         isAvailable = 0;
     }
-    if (!(number_does_not_exist_in_column(number, row, column))) {
+    if (!(number_does_not_exist_in_column(number, row, column, mark_as_erroneous))) {
         isAvailable = 0;
     }
-    if (!(number_does_not_exist_in_block(number, row, column))) {
+    if (!(number_does_not_exist_in_block(number, row, column, mark_as_erroneous))) {
         isAvailable = 0;
     }
     return isAvailable;
@@ -154,7 +169,7 @@ int check_if_board_erroneous() {
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
             number = game_board[i][j];
-            if (number != 0 && !number_is_available(number, i, j)) {
+            if (number != 0 && !number_is_available(number, i, j, 1)) {
                 flag = 1;
             }
         }
@@ -250,7 +265,7 @@ void clear_game_boards() {
 void get_available_numbers_for_set(int *available_numbers, int rows_index, int columns_index) {
     int i;
     for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
-        if (number_is_available(i, rows_index, columns_index)) {
+        if (number_is_available(i, rows_index, columns_index,0)) {
             available_numbers[i - 1] = 0;
         } else {
             available_numbers[i - 1] = 1;

@@ -55,35 +55,39 @@ void init_game();
  * int number - the number to check for
  * int row - the row of the number
  * int column - the column of the number
+ * int mark_as_erroneous - whether to mark erroneous values (1) or not (2)
  * */
-int number_does_not_exist_in_row(int number, int row, int column);
+int number_does_not_exist_in_row(int number, int row, int column, int mark_as_erroneous);
 
 /* checks if the given number exists in the column
  * input:
  * int number - the number to check for
  * int row - the row of the number
  * int column - the column of the number
+ * int mark_as_erroneous - whether to mark erroneous values (1) or not (2)
  * output: 1 if the number is available and 0 otherwise
  * */
-int number_does_not_exist_in_column(int number, int row, int column);
+int number_does_not_exist_in_column(int number, int row, int column, int mark_as_erroneous);
 
 /* checks if the given number exists in the block
  * input:
  * int number - the number to check for
  * int row - the row of the number
  * int column - the column of the number
+ * int mark_as_erroneous - whether to mark erroneous values (1) or not (2)
  * output: 1 if the number is available and 0 otherwise
  * */
-int number_does_not_exist_in_block(int number, int row, int column);
+int number_does_not_exist_in_block(int number, int row, int column, int mark_as_erroneous);
 
 /* checks if the given number exists in the row
  * input:
  * int number - the number to check for
  * int row - the row of the number
  * int column - the column of the number
+ * int mark_as_erroneous - whether to mark erroneous values (1) or not (2)
  * output: 1 if the number is available and 0 otherwise
  * */
-int number_is_available(int number, int row, int column);
+int number_is_available(int number, int row, int column, int mark_as_erroneous);
 
 /* checks if the game board contains any erroneous values
  * input: none

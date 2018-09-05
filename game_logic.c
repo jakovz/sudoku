@@ -48,6 +48,9 @@ void edit(char *path) {
 
 void mark_errors(int X) {
     MARK_ERRORS = X;
+    if (MARK_ERRORS){
+        check_if_board_erroneous();
+    }
 }
 
 void set_cell(int x, int y, int z) {

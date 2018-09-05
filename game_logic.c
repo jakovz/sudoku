@@ -48,7 +48,7 @@ void edit(char *path) {
 
 void mark_errors(int X) {
     MARK_ERRORS = X;
-    if (MARK_ERRORS){
+    if (MARK_ERRORS) {
         check_if_board_erroneous();
     }
 }
@@ -69,17 +69,25 @@ void set_cell(int x, int y, int z) {
     old_is_erroneous = erroneous_board[x][y];
     old = game_board[x][y];
     game_board[x][y] = z;
-    if (z != 0) {
+    if (z != 0 && old == 0) {
         EMPTY_CELLS_NUM--;
-    } else {
+    } else if (z == 0 && old != 0) {
         EMPTY_CELLS_NUM++;
     }
-    if (MARK_ERRORS) {
-        if (check_if_board_erroneous()) {
-            new_is_erroneous = 1;
+    if ((new_is_erroneous = check_if_value_erroneous(x, y, 0, 0)) == 1) {
+        update_moves_list(x, y, z, old, 4, old_is_erroneous, new_is_erroneous);
+        check_if_value_erroneous(x, y, 1, 1);
+        update_moves_list(0, 0, 0, 0, 5, 0, 0);
+    } else {
+        if (z == 0) {
+            erroneous_board[x][y] = 0;
+            update_moves_list(x, y, z, old, 4, old_is_erroneous, new_is_erroneous);
+            cancel_erroneous_values(old, x, y);
+            update_moves_list(0, 0, 0, 0, 5, 0, 0);
+        } else {
+            update_moves_list(x, y, z, old, 0, old_is_erroneous, new_is_erroneous);
         }
     }
-    update_moves_list(x, y, z, old, 0, old_is_erroneous, new_is_erroneous);
     print_board();
     if (EMPTY_CELLS_NUM == 0 && GAME_MODE == 2) {
         if (!validate_solution(0)) {
@@ -104,7 +112,7 @@ void undo(int print_moves) {
         /* this while loop is intended to take care both of undo commands for set and of undo commands
          * for generate and autofill */
         first = 0;
-        if ((*game_moves).generate_autofill_command == 3) {
+        if ((*game_moves).generate_autofill_command == 3 || (*game_moves).generate_autofill_command == 5) {
             /* it's a sentinel */
             game_moves = (*game_moves).prev;
             continue;
@@ -121,26 +129,35 @@ void undo(int print_moves) {
             }
             break;
         }
-        if ((*(*game_moves).next).generate_autofill_command == 0) {
+        if ((*(*game_moves).next).generate_autofill_command == 0 ||
+            (*game_moves).generate_autofill_command == 4) {
             /* we print the board only if it was a set command */
+            if ((*game_moves).generate_autofill_command == 4) {
+                game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
+                erroneous_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_value_erroneous;
+                game_moves = (*game_moves).prev;
+            }
             print_board();
         }
         if ((*(*game_moves).next).old_z_value == 0) {
-            if ((*(*game_moves).next).generate_autofill_command == 0 && print_moves) {
+            if (((*(*game_moves).next).generate_autofill_command == 0 ||
+                 (*(*game_moves).next).generate_autofill_command == 4) && print_moves) {
                 printf("Undo %d,%d: from %d to _\n", (*(*game_moves).next).y_value + 1,
                        (*(*game_moves).next).x_value + 1,
                        (*(*game_moves).next).new_z_value);
             }
             EMPTY_CELLS_NUM++;
         } else if ((*(*game_moves).next).new_z_value == 0) {
-            if ((*(*game_moves).next).generate_autofill_command == 0 && print_moves) {
+            if (((*(*game_moves).next).generate_autofill_command == 0 ||
+                 (*(*game_moves).next).generate_autofill_command == 4) && print_moves) {
                 printf("Undo %d,%d: from _ to %d\n", (*(*game_moves).next).y_value + 1,
                        (*(*game_moves).next).x_value + 1,
                        (*(*game_moves).next).old_z_value);
             }
             EMPTY_CELLS_NUM--;
         } else {
-            if ((*(*game_moves).next).generate_autofill_command == 0 && print_moves) {
+            if (((*(*game_moves).next).generate_autofill_command == 0 ||
+                 (*(*game_moves).next).generate_autofill_command == 4) && print_moves) {
                 printf("Undo %d,%d: from %d to %d\n", (*(*game_moves).next).y_value + 1,
                        (*(*game_moves).next).x_value + 1,
                        (*(*game_moves).next).new_z_value, (*(*game_moves).next).old_z_value);
@@ -153,20 +170,61 @@ void redo(int print_moves) {
     /* we always assume that the current move was already made, and therefore redoing the next move */
     int first;
     first = 1;
+    int redo_x_value;
+    int redo_y_value;
+    int redo_old_z_value;
+    int redo_new_z_value;
+    int erroneous_command;
+    redo_x_value = 0;
+    redo_y_value = 0;
+    redo_old_z_value = 0;
+    redo_new_z_value = 0;
+    erroneous_command = 0;
     if ((*game_moves).next == NULL) {
         printf("Error: no moves to redo\n");
         return;
     }
-    while ((*game_moves).generate_autofill_command == 1 || (*game_moves).generate_autofill_command == 2 || first) {
+    if ((*(*game_moves).next).generate_autofill_command == 4) {
+        redo_x_value = (*(*game_moves).next).x_value;
+        redo_y_value = (*(*game_moves).next).y_value;
+        redo_old_z_value = (*(*game_moves).next).old_z_value;
+        redo_new_z_value = (*(*game_moves).next).new_z_value;
+        erroneous_command = 1;
+    }
+    while ((*game_moves).generate_autofill_command == 1 || (*game_moves).generate_autofill_command == 2 ||
+           (*game_moves).generate_autofill_command == 4 || first) {
         first = 0;
-        if ((*(*game_moves).next).generate_autofill_command == 3) {
+        if ((*(*game_moves).next).generate_autofill_command == 3 ||
+            (*(*game_moves).next).generate_autofill_command == 5) {
             /* we got to the sentinel */
             game_moves = (*game_moves).next;
+            print_board();
             if (print_moves) {
-                print_board();
-                printf("All recent changes were redone\n");
+                if ((*game_moves).generate_autofill_command == 3) {
+                    printf("All recent changes were redone\n");
+                } else {
+                    if (redo_new_z_value == 0) {
+                        if (print_moves) {
+                            printf("Redo %d,%d: from %d to _\n", redo_y_value + 1, redo_x_value + 1,
+                                   redo_old_z_value);
+                        }
+                        EMPTY_CELLS_NUM++;
+                    } else if (redo_old_z_value == 0) {
+                        if (print_moves) {
+                            printf("Redo %d,%d: from _ to %d\n", redo_y_value + 1, redo_x_value + 1,
+                                   redo_new_z_value);
+                        }
+                        EMPTY_CELLS_NUM--;
+                    } else {
+                        if (print_moves) {
+                            printf("Redo %d,%d: from %d to %d\n", redo_y_value + 1, redo_x_value + 1,
+                                   redo_old_z_value,
+                                   redo_new_z_value);
+                        }
+                    }
+                }
+                break;
             }
-            break;
         }
         game_board[(*(*game_moves).next).x_value][(*(*game_moves).next).y_value] = (*(*game_moves).next).new_z_value;
         erroneous_board[(*(*game_moves).next).x_value][(*(*game_moves).next).y_value] = (*(*game_moves).next).new_value_erroneous;
@@ -175,19 +233,20 @@ void redo(int print_moves) {
             print_board();
         }
         if ((*game_moves).new_z_value == 0) {
-            if ((*game_moves).generate_autofill_command == 0 && print_moves) {
+            if (((*game_moves).generate_autofill_command == 0) && print_moves) {
                 printf("Redo %d,%d: from %d to _\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
                        (*game_moves).old_z_value);
             }
             EMPTY_CELLS_NUM++;
         } else if ((*game_moves).old_z_value == 0) {
-            if ((*game_moves).generate_autofill_command == 0 && print_moves) {
+            if (((*game_moves).generate_autofill_command == 0) && print_moves) {
                 printf("Redo %d,%d: from _ to %d\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
                        (*game_moves).new_z_value);
             }
             EMPTY_CELLS_NUM--;
         } else {
-            if ((*game_moves).generate_autofill_command == 0 && print_moves) {
+            if (((*game_moves).generate_autofill_command == 0) &&
+                print_moves) {
                 printf("Redo %d,%d: from %d to %d\n", (*game_moves).y_value + 1, (*game_moves).x_value + 1,
                        (*game_moves).old_z_value,
                        (*game_moves).new_z_value);
@@ -480,7 +539,7 @@ int get_autofill_value(int x, int y) {
     available_number = 0;
     for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
         /* iterating all possible numbers */
-        if (number_is_available(i, x, y, 0)) {
+        if (number_is_available(i, x, y, 0, 0)) {
             count++;
             available_number = i;
         }

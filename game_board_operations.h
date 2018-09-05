@@ -57,7 +57,7 @@ void init_game();
  * int column - the column of the number
  * int mark_as_erroneous - whether to mark erroneous values (1) or not (2)
  * */
-int number_does_not_exist_in_row(int number, int row, int column, int mark_as_erroneous);
+int number_does_not_exist_in_row(int number, int row, int column, int mark_as_erroneous, int save_moves);
 
 /* checks if the given number exists in the column
  * input:
@@ -67,7 +67,7 @@ int number_does_not_exist_in_row(int number, int row, int column, int mark_as_er
  * int mark_as_erroneous - whether to mark erroneous values (1) or not (2)
  * output: 1 if the number is available and 0 otherwise
  * */
-int number_does_not_exist_in_column(int number, int row, int column, int mark_as_erroneous);
+int number_does_not_exist_in_column(int number, int row, int column, int mark_as_erroneous, int save_moves);
 
 /* checks if the given number exists in the block
  * input:
@@ -77,7 +77,7 @@ int number_does_not_exist_in_column(int number, int row, int column, int mark_as
  * int mark_as_erroneous - whether to mark erroneous values (1) or not (2)
  * output: 1 if the number is available and 0 otherwise
  * */
-int number_does_not_exist_in_block(int number, int row, int column, int mark_as_erroneous);
+int number_does_not_exist_in_block(int number, int row, int column, int mark_as_erroneous, int save_moves);
 
 /* checks if the given number exists in the row
  * input:
@@ -87,13 +87,19 @@ int number_does_not_exist_in_block(int number, int row, int column, int mark_as_
  * int mark_as_erroneous - whether to mark erroneous values (1) or not (2)
  * output: 1 if the number is available and 0 otherwise
  * */
-int number_is_available(int number, int row, int column, int mark_as_erroneous);
+int number_is_available(int number, int row, int column, int mark_as_erroneous, int save_moves);
 
 /* checks if the game board contains any erroneous values
  * input: none
  * output: 1 if the board contains erroneous values and 0 otherwise
  * */
 int check_if_board_erroneous();
+
+/* checks if the specific cell in game board contains an erroneous value
+ * input: none
+ * output: 1 if the cell is erroneous and 0 otherwise
+ * */
+int check_if_value_erroneous(int x, int y, int set_erroneous_moves, int save_erroneous_moves);
 
 /* frees the memory consumed by all game boards
  * input: none
@@ -121,3 +127,5 @@ void print_board();
  * output: the number of empty cells in the game board
  * */
 int count_empty_cells();
+
+int cancel_erroneous_values(int old, int x, int y);

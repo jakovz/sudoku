@@ -326,8 +326,6 @@ void
 get_available_numbers_for_backtrack(int **tmp_game_board, int *available_numbers, int rows_index, int columns_index) {
     int i;
     int j;
-    int number;
-    int not_available;
     int row_lower_bound;
     int row_upper_bound;
     int column_lower_bound;
@@ -336,34 +334,25 @@ get_available_numbers_for_backtrack(int **tmp_game_board, int *available_numbers
     row_upper_bound = row_lower_bound + ROWS_PER_BLOCK;
     column_lower_bound = (columns_index / COLUMNS_PER_BLOCK) * COLUMNS_PER_BLOCK;
     column_upper_bound = column_lower_bound + COLUMNS_PER_BLOCK;
-    not_available = 0;
-    for (number = 1; number <= ROWS_COLUMNS_NUM; number++) {
-        /* checking the row */
-        for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-            if (tmp_game_board[rows_index][i] == number && i != columns_index) {
-                not_available = 1;
+    /* checking the row */
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        if (i != columns_index && tmp_game_board[rows_index][i]!=0) {
+            available_numbers[tmp_game_board[rows_index][i] - 1] = 1;
+        }
+    }
+    /* checking the column */
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        if (i != rows_index && tmp_game_board[i][columns_index]!=0) {
+            available_numbers[tmp_game_board[i][columns_index] - 1] = 1;
+        }
+    }
+    /* checking the block */
+    for (i = row_lower_bound; i < row_upper_bound; i++) {
+        for (j = column_lower_bound; j < column_upper_bound; j++) {
+            if (i != rows_index && j != columns_index && tmp_game_board[i][j]!=0) {
+                available_numbers[tmp_game_board[i][j] - 1] = 1;
             }
         }
-        /* checking the column */
-        for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
-            if (tmp_game_board[i][columns_index] == number && i != rows_index) {
-                not_available = 1;
-            }
-        }
-        /* checking the block */
-        for (i = row_lower_bound; i < row_upper_bound; i++) {
-            for (j = column_lower_bound; j < column_upper_bound; j++) {
-                if (tmp_game_board[i][j] == number && i != rows_index && j!=columns_index) {
-                    not_available = 1;
-                }
-            }
-        }
-        if (not_available) {
-            available_numbers[number - 1] = 1;
-        } else {
-            available_numbers[number - 1] = 0;
-        }
-        not_available = 0;
     }
 }
 

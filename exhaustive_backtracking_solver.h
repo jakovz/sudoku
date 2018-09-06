@@ -39,4 +39,5 @@ struct StackNode pop(struct StackNode **root);
  * output:
  * the number of possible solutions the board has
  * */
-int exhaustive_backtracking(int rows_index, int columns_index, int **game_board, int cell_current_value);
+int exhaustive_backtracking(int rows_index, int columns_index, int **tmp_game_board, int cell_current_value);
+

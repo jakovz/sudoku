@@ -38,7 +38,7 @@ struct StackNode pop(struct StackNode **root) {
     return tmp;
 }
 
-int exhaustive_backtracking(int rows_index, int columns_index, int **game_board, int cell_current_value) {
+int exhaustive_backtracking(int rows_index, int columns_index, int **tmp_game_board, int cell_current_value) {
     /*returns num of possible solutions to a given board (if the cell_current_value board is solvable) using an exhaustive (deterministic) backtracking algorithm*/
     int *available_numbers;
     int num_of_solutions;
@@ -65,7 +65,7 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **game_board,
         while ((rows_index < ROWS_COLUMNS_NUM) && (columns_index < ROWS_COLUMNS_NUM)) {
             if (current_indicators_board[rows_index][columns_index] == 0) {
                 /* means that this is the first free cell at this step */
-                if (game_board[rows_index][columns_index] == 0) {
+                if (tmp_game_board[rows_index][columns_index] == 0) {
                     cell_current_value = 0;
                 }
                 for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
@@ -73,7 +73,7 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **game_board,
                 }
                 counter = 0;
                 /* creating the actual available numbers array*/
-                get_available_numbers_for_set(available_numbers, rows_index, columns_index);
+                get_available_numbers_for_backtrack(tmp_game_board, available_numbers, rows_index, columns_index);
                 for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
                     if (available_numbers[i] == 0 && (i + 1) > cell_current_value) {
                         counter++;
@@ -104,7 +104,7 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **game_board,
                     for (i = start_row; i < ROWS_COLUMNS_NUM; i++) {
                         for (j = start_column; j < ROWS_COLUMNS_NUM; j++) {
                             if (current_indicators_board[i][j] == 0) {
-                                game_board[i][j] = 0;
+                                tmp_game_board[i][j] = 0;
                             }
                         }
                     }
@@ -113,7 +113,7 @@ int exhaustive_backtracking(int rows_index, int columns_index, int **game_board,
                 /* if we got here there are more available numbers for this cell */
                 for (p = 0; p < ROWS_COLUMNS_NUM; p++) {
                     if (available_numbers[p] == 0 && (p + 1) > cell_current_value) {
-                        game_board[rows_index][columns_index] = p + 1;
+                        tmp_game_board[rows_index][columns_index] = p + 1;
                         cell_current_value = p + 1;
                         break;
                     }

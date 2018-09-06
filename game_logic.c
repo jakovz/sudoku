@@ -85,7 +85,10 @@ void set_cell(int x, int y, int z) {
             cancel_erroneous_values(old, x, y);
             update_moves_list(0, 0, 0, 0, 5, 0, 0);
         } else {
-            update_moves_list(x, y, z, old, 0, old_is_erroneous, new_is_erroneous);
+            erroneous_board[x][y] = 0;
+            update_moves_list(x, y, z, old, 4, old_is_erroneous, new_is_erroneous);
+            cancel_erroneous_values(old, x, y);
+            update_moves_list(0, 0, 0, 0, 5, 0, 0);
         }
     }
     print_board();
@@ -169,17 +172,15 @@ void undo(int print_moves) {
 void redo(int print_moves) {
     /* we always assume that the current move was already made, and therefore redoing the next move */
     int first;
-    first = 1;
     int redo_x_value;
     int redo_y_value;
     int redo_old_z_value;
     int redo_new_z_value;
-    int erroneous_command;
+    first = 1;
     redo_x_value = 0;
     redo_y_value = 0;
     redo_old_z_value = 0;
     redo_new_z_value = 0;
-    erroneous_command = 0;
     if ((*game_moves).next == NULL) {
         printf("Error: no moves to redo\n");
         return;
@@ -189,7 +190,6 @@ void redo(int print_moves) {
         redo_y_value = (*(*game_moves).next).y_value;
         redo_old_z_value = (*(*game_moves).next).old_z_value;
         redo_new_z_value = (*(*game_moves).next).new_z_value;
-        erroneous_command = 1;
     }
     while ((*game_moves).generate_autofill_command == 1 || (*game_moves).generate_autofill_command == 2 ||
            (*game_moves).generate_autofill_command == 4 || first) {
@@ -351,39 +351,74 @@ int try_generate(int x) {
     int *legal_values;
     int rand_value;
     int second_count;
+    int **second_tmp_board;
     legal_values = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+    second_tmp_board = (int **) malloc(sizeof(int *) * ROWS_COLUMNS_NUM);
+    if (second_tmp_board == NULL) {
+        printf("Error: generate has failed\n");
+        exit(-1);
+    }
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        second_tmp_board[i] = (int *) malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+        if (second_tmp_board[i] == NULL) {
+            printf("Error: generate has failed\n");
+            exit(-1);
+        }
+    }
+    /* initializing values */
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            second_tmp_board[i][j] = 0;
+        }
+    }
     if (legal_values == NULL) {
         printf("Error: error generating board\n");
         exit(-1);
     }
-    for (i = 0; i < x; i++) {
+    i = 0;
+    while (i < x) {
         count = 0;
         x_index = rand() % ROWS_COLUMNS_NUM;
         y_index = rand() % ROWS_COLUMNS_NUM;
-        get_available_numbers_for_set(legal_values, x_index, y_index);
-        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
-            if (legal_values[j] == 0) {
-                count++;
+        if (second_tmp_board[x_index][y_index] == 1) {
+            /* we already chose this cell */
+            continue;
+        } else {
+            second_tmp_board[x_index][y_index] = 1;
+            i++;
+            get_available_numbers_for_set(legal_values, x_index, y_index);
+            for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+                if (legal_values[j] == 0) {
+                    count++;
+                }
             }
-        }
-        if (count == 0) {
-            /* no legal values available for this cell */
-            clear_game_boards();
-            free(legal_values);
-            return 0;
-        }
-        rand_value = (rand() % count) + 1; /* randomizing a legal value */
-        j = 0;
-        second_count = 0;
-        while (rand_value != second_count) {
-            /* getting the actual value out of the legal_values array */
-            if (legal_values[j] == 0) {
-                second_count++;
+            if (count == 0) {
+                /* no legal values available for this cell */
+                clear_game_boards();
+                for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+                    free(second_tmp_board[i]);
+                }
+                free(second_tmp_board);
+                free(legal_values);
+                return 0;
             }
-            j++;
+            rand_value = (rand() % count) + 1; /* randomizing a legal value */
+            j = 0;
+            second_count = 0;
+            while (rand_value != second_count) {
+                /* getting the actual value out of the legal_values array */
+                if (legal_values[j] == 0) {
+                    second_count++;
+                }
+                j++;
+            }
+            game_board[x_index][y_index] = legal_values[j - 1];
         }
-        game_board[x_index][y_index] = legal_values[j - 1];
     }
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        free(second_tmp_board[i]);
+    }
+    free(second_tmp_board);
     free(legal_values);
     if (!solve_board(game_board, ROWS_COLUMNS_NUM, ROWS_PER_BLOCK, COLUMNS_PER_BLOCK, 1, solved_board)) {
         return 0;
@@ -454,10 +489,14 @@ void generate(int x, int y) {
     }
     /* if the program got here, it means that the board was generated successfully */
     copy_board(solved_board, tmp_board, 0);
-    for (i = 0; i < y; i++) {
+    i = 0;
+    while (i < y) {
         x_index = rand() % ROWS_COLUMNS_NUM;
         y_index = rand() % ROWS_COLUMNS_NUM;
-        second_tmp_board[x_index][y_index] = 1;
+        if (second_tmp_board[x_index][y_index] == 0) {
+            second_tmp_board[x_index][y_index] = 1;
+            i++;
+        }
     }
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {

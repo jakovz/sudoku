@@ -174,7 +174,7 @@ int check_if_value_erroneous(int x, int y, int set_erroneous_moves, int save_err
     return 0;
 }
 
-int cancel_erroneous_values(int old, int x, int y) {
+void cancel_erroneous_values(int old, int x, int y) {
     int i;
     int j;
     int row_lower_bound;
@@ -319,6 +319,51 @@ void get_available_numbers_for_set(int *available_numbers, int rows_index, int c
         } else {
             available_numbers[i - 1] = 1;
         }
+    }
+}
+
+void
+get_available_numbers_for_backtrack(int **tmp_game_board, int *available_numbers, int rows_index, int columns_index) {
+    int i;
+    int j;
+    int number;
+    int not_available;
+    int row_lower_bound;
+    int row_upper_bound;
+    int column_lower_bound;
+    int column_upper_bound;
+    row_lower_bound = (rows_index / ROWS_PER_BLOCK) * ROWS_PER_BLOCK;
+    row_upper_bound = row_lower_bound + ROWS_PER_BLOCK;
+    column_lower_bound = (columns_index / COLUMNS_PER_BLOCK) * COLUMNS_PER_BLOCK;
+    column_upper_bound = column_lower_bound + COLUMNS_PER_BLOCK;
+    not_available = 0;
+    for (number = 1; number <= ROWS_COLUMNS_NUM; number++) {
+        /* checking the row */
+        for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+            if (tmp_game_board[rows_index][i] == number && i != columns_index) {
+                not_available = 1;
+            }
+        }
+        /* checking the column */
+        for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+            if (tmp_game_board[i][columns_index] == number && i != rows_index) {
+                not_available = 1;
+            }
+        }
+        /* checking the block */
+        for (i = row_lower_bound; i < row_upper_bound; i++) {
+            for (j = column_lower_bound; j < column_upper_bound; j++) {
+                if (tmp_game_board[i][j] == number && i != rows_index && j!=columns_index) {
+                    not_available = 1;
+                }
+            }
+        }
+        if (not_available) {
+            available_numbers[number - 1] = 1;
+        } else {
+            available_numbers[number - 1] = 0;
+        }
+        not_available = 0;
     }
 }
 

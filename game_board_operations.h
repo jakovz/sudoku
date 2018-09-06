@@ -128,4 +128,7 @@ void print_board();
  * */
 int count_empty_cells();
 
-int cancel_erroneous_values(int old, int x, int y);
+void cancel_erroneous_values(int old, int x, int y);
+
+void
+get_available_numbers_for_backtrack(int **tmp_game_board, int *available_numbers, int rows_index, int columns_index);

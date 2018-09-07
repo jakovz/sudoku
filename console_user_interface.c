@@ -199,6 +199,7 @@ void play_game() {
     size_t count;
     count = 0;
     splitted_params = NULL;
+    MARK_ERRORS = 1;
     printf("Sudoku\n------\n");
     command_max_length = COMMAND_AND_PARAMS_SIZE;
     command_and_parameters = (char *) malloc(sizeof(char) * command_max_length);

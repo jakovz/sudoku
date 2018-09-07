@@ -590,15 +590,20 @@ void num_solutions() {
     free(exhaustive_board);
 }
 
-int get_autofill_value(int x, int y) {
+int get_autofill_value(int x, int y, int **filled_board) {
     int i;
+    int *available_numbers;
     int available_number;
     int count; /*  counts the number of available numbers that can be filled in the empty cell. */
     count = 0;
-    available_number = 0;
+    available_numbers = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        available_numbers[i] = 0;
+    }
+    get_available_numbers_for_backtrack(filled_board, available_numbers, x, y);
     for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
         /* iterating all possible numbers */
-        if (number_is_available(i, x, y, 0, 0)) {
+        if (available_numbers[i-1]==0) {
             count++;
             available_number = i;
         }
@@ -638,10 +643,10 @@ void autofill() {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
             if (game_board[i][j] == 0) {
                 /* we are going to check if a cell has an obvious value only if the cell is empty */
-                if ((new_value = get_autofill_value(i, j)) > 0) {
+                if ((new_value = get_autofill_value(i, j, filled_board)) > 0) {
                     /* means that there is an autofill option */
                     filled_board[i][j] = new_value; /* we do not want the new values to affect autofill. */
-                    printf("Cell <%d,%d> set to %d\n", i, j, new_value);
+                    printf("Cell <%d,%d> set to %d\n", j + 1, i + 1, new_value);
                     count++;
                 }
             }

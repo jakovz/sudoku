@@ -219,11 +219,11 @@ int check_if_board_erroneous() {
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
             if (erroneous_board[i][j] == 1) {
-                return 0;
+                return 1;
             }
         }
     }
-    return 1;
+    return 0;
 }
 
 void free_game_boards() {

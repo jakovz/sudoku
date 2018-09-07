@@ -106,10 +106,10 @@ void set_cell(int x, int y, int z) {
 void undo_move(){
     game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
     if ((*game_moves).old_z_value!=0 && (*game_moves).new_z_value == 0){
-        EMPTY_CELLS_NUM++;
+        EMPTY_CELLS_NUM--;
     }
     if ((*game_moves).old_z_value==0 && (*game_moves).new_z_value!=0){
-        EMPTY_CELLS_NUM--;
+        EMPTY_CELLS_NUM++;
     }
     erroneous_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_value_erroneous;
     game_moves = (*game_moves).prev;

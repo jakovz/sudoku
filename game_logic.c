@@ -593,21 +593,27 @@ void num_solutions() {
 int get_autofill_value(int x, int y, int **filled_board) {
     int i;
     int *available_numbers;
+    int *filled_available_numbers;
     int available_number;
     int count; /*  counts the number of available numbers that can be filled in the empty cell. */
     count = 0;
     available_numbers = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
+    filled_available_numbers = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
     for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
         available_numbers[i] = 0;
+        filled_available_numbers[i] = 0;
     }
-    get_available_numbers_for_backtrack(filled_board, available_numbers, x, y);
+    get_available_numbers_for_backtrack(game_board, available_numbers, x, y);
+    get_available_numbers_for_backtrack(filled_board, filled_available_numbers, x, y);
     for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
         /* iterating all possible numbers */
-        if (available_numbers[i-1]==0) {
+        if (available_numbers[i-1]==0 && filled_available_numbers[i-1]==0) {
             count++;
             available_number = i;
         }
     }
+    free(available_numbers);
+    free(filled_available_numbers);
     if (count > 1 || count == 0) {
         return 0;
     } else {

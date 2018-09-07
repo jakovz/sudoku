@@ -77,6 +77,7 @@ void set_cell(int x, int y, int z) {
     if ((new_is_erroneous = check_if_value_erroneous(x, y, 0, 0)) == 1) {
         update_moves_list(x, y, z, old, 4, old_is_erroneous, new_is_erroneous);
         check_if_value_erroneous(x, y, 1, 1);
+        cancel_erroneous_values(old, x, y);
         update_moves_list(0, 0, 0, 0, 5, 0, 0);
     } else {
         if (z == 0) {

@@ -613,14 +613,18 @@ int get_autofill_value(int x, int y, int **filled_board) {
             available_number = i;
         }
     }
-    free(available_numbers);
-    free(filled_available_numbers);
     if (count > 1 || count == 0) {
+        free(available_numbers);
+        free(filled_available_numbers);
         return 0;
     } else {
-        if (filled_available_numbers[i - 1] == 0) {
+        if (filled_available_numbers[available_number - 1] == 0) {
+            free(available_numbers);
+            free(filled_available_numbers);
             return available_number;
         } else {
+            free(available_numbers);
+            free(filled_available_numbers);
             return 0;
         }
     }

@@ -144,7 +144,7 @@ int number_does_not_exist_in_block(int number, int row, int column, int mark_as_
                     erroneous_board[i][j] = 1;
                     erroneous_board[row][column] = 1; /*in order to mark all erroneous cells as so*/
                     if (save_moves) {
-                        update_moves_list(row, i, game_board[i][j], game_board[i][j], 1, old_value_erroneous, 1);
+                        update_moves_list(i, j, game_board[i][j], game_board[i][j], 1, old_value_erroneous, 1);
                     }
                     flag = 0;
                 } else {

@@ -66,7 +66,6 @@ void set_cell(int x, int y, int z) {
         printf("Error: cell is fixed\n");
         return;
     }
-    print_all_game_moves();
     old_is_erroneous = erroneous_board[x][y];
     old = game_board[x][y];
     game_board[x][y] = z;
@@ -101,26 +100,6 @@ void set_cell(int x, int y, int z) {
             printf("Puzzle solved successfully\n");
             GAME_MODE = 0;
         }
-    }
-}
-
-void print_all_game_moves() {
-    struct game_move *current;
-    current = game_moves;
-    printf("CURRENT: x_value:%d, y_value:%d, old_z_value:%d, new_z_value:%d, generate_autofill:%d, old_err:%d, new_err:%d\n\n",
-           current->x_value, current->y_value, current->old_z_value, current->new_z_value,
-           current->generate_autofill_command, current->old_value_erroneous, current->new_value_erroneous);
-    while (current->prev != NULL) {
-        current = current->prev;
-    }
-    printf("x_value:%d, y_value:%d, old_z_value:%d, new_z_value:%d, generate_autofill:%d, old_err:%d, new_err:%d\n",
-           current->x_value, current->y_value, current->old_z_value, current->new_z_value,
-           current->generate_autofill_command, current->old_value_erroneous, current->new_value_erroneous);
-    while (current->next != NULL) {
-        current = current->next;
-        printf("x_value:%d, y_value:%d, old_z_value:%d, new_z_value:%d, generate_autofill:%d, old_err:%d, new_err:%d\n",
-               current->x_value, current->y_value, current->old_z_value, current->new_z_value,
-               current->generate_autofill_command, current->old_value_erroneous, current->new_value_erroneous);
     }
 }
 
@@ -166,7 +145,6 @@ void undo(int print_moves) {
         printf("Error: no moves to undo\n");
         return;
     }
-    print_all_game_moves();
     while ((*game_moves).generate_autofill_command == 1 || first) {
         /* this while loop is intended to take care both of undo commands for set and of undo commands
          * for generate and autofill */

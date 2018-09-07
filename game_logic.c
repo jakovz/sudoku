@@ -9,6 +9,8 @@
 
 void solve(char *path) {
     /* loads the board from file */
+    int i;
+    int j;
     FILE *fp;
     GAME_MODE = 2;
     fp = fopen(path, "r");
@@ -20,10 +22,19 @@ void solve(char *path) {
     }
     fclose(fp);
     EMPTY_CELLS_NUM = count_empty_cells();
+    if (MARK_ERRORS == 1){
+        for (i = 0; i < ROWS_COLUMNS_NUM; i++){
+            for (j = 0; j < ROWS_COLUMNS_NUM; j++){
+                check_if_value_erroneous(i, j, 1, 0);
+            }
+        }
+    }
     print_board();
 }
 
 void edit(char *path) {
+    int i;
+    int j;
     FILE *fp;
     GAME_MODE = 1; /*Edit mode*/
     if (path == NULL) {
@@ -43,13 +54,24 @@ void edit(char *path) {
         fclose(fp);
     }
     EMPTY_CELLS_NUM = count_empty_cells();
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++){
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++){
+            check_if_value_erroneous(i, j, 1, 0);
+        }
+    }
     print_board();
 }
 
 void mark_errors(int X) {
+    int i;
+    int j;
     MARK_ERRORS = X;
     if (MARK_ERRORS) {
-        check_if_board_erroneous();
+        for (i = 0; i < ROWS_COLUMNS_NUM; i++){
+            for (j = 0; j < ROWS_COLUMNS_NUM; j++){
+                check_if_value_erroneous(i, j, 1, 0);
+            }
+        }
     }
 }
 

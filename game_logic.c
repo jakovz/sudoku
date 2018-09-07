@@ -596,6 +596,7 @@ int get_autofill_value(int x, int y, int **filled_board) {
     int *filled_available_numbers;
     int available_number;
     int count; /*  counts the number of available numbers that can be filled in the empty cell. */
+    available_number = 0;
     count = 0;
     available_numbers = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
     filled_available_numbers = malloc(sizeof(int) * ROWS_COLUMNS_NUM);
@@ -607,7 +608,7 @@ int get_autofill_value(int x, int y, int **filled_board) {
     get_available_numbers_for_backtrack(filled_board, filled_available_numbers, x, y);
     for (i = 1; i <= ROWS_COLUMNS_NUM; i++) {
         /* iterating all possible numbers */
-        if (available_numbers[i-1]==0 && filled_available_numbers[i-1]==0) {
+        if (available_numbers[i - 1] == 0) {
             count++;
             available_number = i;
         }
@@ -617,7 +618,11 @@ int get_autofill_value(int x, int y, int **filled_board) {
     if (count > 1 || count == 0) {
         return 0;
     } else {
-        return available_number;
+        if (filled_available_numbers[i - 1] == 0) {
+            return available_number;
+        } else {
+            return 0;
+        }
     }
 }
 

@@ -22,11 +22,9 @@ void solve(char *path) {
     }
     fclose(fp);
     EMPTY_CELLS_NUM = count_empty_cells();
-    if (MARK_ERRORS == 1){
-        for (i = 0; i < ROWS_COLUMNS_NUM; i++){
-            for (j = 0; j < ROWS_COLUMNS_NUM; j++){
-                check_if_value_erroneous(i, j, 1, 0);
-            }
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
+            check_if_value_erroneous(i, j, 1, 0);
         }
     }
     print_board();
@@ -54,8 +52,8 @@ void edit(char *path) {
         fclose(fp);
     }
     EMPTY_CELLS_NUM = count_empty_cells();
-    for (i = 0; i < ROWS_COLUMNS_NUM; i++){
-        for (j = 0; j < ROWS_COLUMNS_NUM; j++){
+    for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+        for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
             check_if_value_erroneous(i, j, 1, 0);
         }
     }
@@ -67,8 +65,8 @@ void mark_errors(int X) {
     int j;
     MARK_ERRORS = X;
     if (MARK_ERRORS) {
-        for (i = 0; i < ROWS_COLUMNS_NUM; i++){
-            for (j = 0; j < ROWS_COLUMNS_NUM; j++){
+        for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+            for (j = 0; j < ROWS_COLUMNS_NUM; j++) {
                 check_if_value_erroneous(i, j, 1, 0);
             }
         }
@@ -201,7 +199,7 @@ void undo(int print_moves) {
     }
 }
 
-void redo_move(){
+void redo_move() {
     game_board[(*(*game_moves).next).x_value][(*(*game_moves).next).y_value] = (*(*game_moves).next).new_z_value;
     if ((*(*game_moves).next).old_z_value != 0 && (*(*game_moves).next).new_z_value == 0) {
         EMPTY_CELLS_NUM++;
@@ -213,7 +211,8 @@ void redo_move(){
     game_moves = (*game_moves).next;
 }
 
-void print_redo_message(int print_moves, int redo_x_value, int redo_y_value, int redo_old_z_value, int redo_new_z_value){
+void
+print_redo_message(int print_moves, int redo_x_value, int redo_y_value, int redo_old_z_value, int redo_new_z_value) {
     if (redo_new_z_value == 0) {
         if (print_moves) {
             printf("Redo %d,%d: from %d to _\n", redo_y_value + 1, redo_x_value + 1,

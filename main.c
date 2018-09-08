@@ -8,7 +8,7 @@
  * ilp_solver.c - the functions who are responsible for solving the game board through Gurobi (ILP).
  * exhaustive_backtracking_solver.c - the functions who are responsible for giving the number of the solution exist for the
  * game board through exhaustive_backtracking.
- * helper_functions - generic helper functions which are not directly related to the game itself.
+ * helper_functions.c - generic helper functions which are not directly related to the game itself.
  *
  * In this way of code splitting, each code part is responsible for one specific and dedicated purpose.
  * it is really easy to understand where each function will be found and moreover, the number of functions and size of

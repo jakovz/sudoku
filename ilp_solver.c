@@ -177,11 +177,17 @@ int solve_board(int **game_board, int rows_columns, int rows_per_block, int colu
         result = 1; /* success */
     } else {
         result = 0;
-        goto QUIT;
+        free_ilp_variables(&ind, &val, &lb, &vtype);
+        GRBfreemodel(model);  /* free model */
+        GRBfreeenv(env); /* free environment */
+        return result;
     }
 
     results = (double *) malloc(sizeof(double) * rows_columns * rows_columns * rows_columns);
-    if (results == NULL) goto QUIT;
+    if (results == NULL){
+        printf("Error: ILP has failed\n");
+        exit(-1);
+    }
 
     error = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, rows_columns * rows_columns * rows_columns, results);
     if (error) goto QUIT;

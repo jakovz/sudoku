@@ -1,5 +1,3 @@
-#include <malloc.h>
-#include <time.h>
 #include "console_user_interface.h"
 
 /* The way we chose to split our code:

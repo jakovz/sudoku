@@ -24,7 +24,7 @@ static void execute_set_cell(char **params) {
     int i;
     char *next;
     if (params == NULL) {
-        printf("Error: invalid command\n");
+        printf("ERROR: invalid command\n");
         return;
     }
     for (i = 0; i < 3; i++) {
@@ -36,7 +36,7 @@ static void execute_set_cell(char **params) {
                 return;
             }
         } else {
-            printf("Error: invalid command\n");
+            printf("ERROR: invalid command\n");
             return;
         }
     }
@@ -55,7 +55,7 @@ static void execute_generate(char **params) {
     int i;
     char *next;
     if (params == NULL) {
-        printf("Error: invalid command\n");
+        printf("ERROR: invalid command\n");
         return;
     }
     for (i = 0; i < 2; i++) {
@@ -66,7 +66,7 @@ static void execute_generate(char **params) {
                 return;
             }
         } else {
-            printf("Error: invalid command\n");
+            printf("ERROR: invalid command\n");
             return;
         }
 
@@ -81,13 +81,13 @@ static void execute_generate(char **params) {
  * */
 static void execute_save_board(char **params) {
     if (params == NULL) {
-        printf("Error: invalid command\n");
+        printf("ERROR: invalid command\n");
         return;
     }
     if (params[0] != NULL) {
         save_board(params[0]);
     } else {
-        printf("Error: invalid command\n");
+        printf("ERROR: invalid command\n");
         return;
     }
 }
@@ -102,7 +102,7 @@ static void execute_get_hint(char **params) {
     int i;
     char *next;
     if (params == NULL) {
-        printf("Error: invalid command\n");
+        printf("ERROR: invalid command\n");
         return;
     }
     for (i = 0; i < 2; i++) {
@@ -113,7 +113,7 @@ static void execute_get_hint(char **params) {
                 return;
             }
         } else {
-            printf("Error: invalid command\n");
+            printf("ERROR: invalid command\n");
             return;
         }
     }
@@ -129,13 +129,13 @@ static void execute_mark_errors(char **params) {
     int mark_errors_param;
     char *next;
     if (params == NULL) {
-        printf("Error: invalid command\n");
+        printf("ERROR: invalid command\n");
         return;
     }
     if (params[0] != NULL) {
         mark_errors_param = strtol(params[0], &next, 10);
     } else {
-        printf("Error: invalid command\n");
+        printf("ERROR: invalid command\n");
         return;
     }
     if ((*next) != '\0' || mark_errors_param > 1 || mark_errors_param < 0) {
@@ -155,7 +155,7 @@ static int execute_command(char *command, char **params) {
     /* gets the command as a string and invokes it's corresponding function */
     if (strcmp(all_commands[0], command) == 0) {
         if (params == NULL || params[0] == NULL) {
-            printf("Error: invalid command\n");
+            printf("ERROR: invalid command\n");
             return 1;
         }
         solve(params[0]);
@@ -192,7 +192,7 @@ static int execute_command(char *command, char **params) {
     } else if ((strcmp(all_commands[14], command) == 0)) {
         return 0;
     } else {
-        printf("Error: invalid command\n");
+        printf("ERROR: invalid command\n");
     }
     return 1;
 }

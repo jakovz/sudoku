@@ -317,7 +317,7 @@ void save_board(char *path) {
 void get_hint(int x, int y) {
     int tmp;
     if (x > ROWS_COLUMNS_NUM || y > ROWS_COLUMNS_NUM) {
-        printf("Error: value not in range 1-%d", ROWS_COLUMNS_NUM);
+        printf("Error: value not in range 1-%d\n", ROWS_COLUMNS_NUM);
         return;
     }
     tmp = x;

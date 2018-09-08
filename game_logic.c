@@ -572,6 +572,12 @@ void num_solutions() {
     }
     if (check_if_board_erroneous() == 1) {
         printf("Error: board contains erroneous values\n");
+        for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
+            free(current_indicators_board[i]);
+            free(exhaustive_board[i]);
+        }
+        free(current_indicators_board);
+        free(exhaustive_board);
         return;
     }
     copy_board(game_board, exhaustive_board, 0);

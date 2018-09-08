@@ -6,6 +6,8 @@ GUROBI_COMP = -I/usr/local/lib/gurobi563/include
 CLIB     = -L/usr/local/lib/gurobi563/lib -lgurobi56
 INC      =  /usr/local/lib/gurobi563/include/
 
+all: $(EXEC)
+
 $(EXEC): $(OBJS)
 	$(CC) $(OBJS) $(CLIB) -o $@ -lm
 	

@@ -3,7 +3,13 @@
 #include <stdlib.h>
 #include "helper_functions.h"
 
-char *strdup(const char *s) {
+
+/*
+ * duplicates a given string
+ * input: const char *s - the string to duplicate
+ * output: char * - the duplicated string
+ */
+static char *strdup(const char *s) {
     size_t size = strlen(s) + 1;
     char *p = malloc(size);
     if (p == NULL) {

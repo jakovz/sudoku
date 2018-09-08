@@ -2,23 +2,38 @@
 #define sudoku_GAME_LOGIC_H
 #endif /* sudoku_GAME_LOGIC_H */
 
-/* frees all the game structures and exists the game */
+/* all the functions which commit the game commands themselves */
+
+
+/* frees all the game structures and exists the game
+ * input: none
+ * output: none
+ * */
 void exit_game();
 
-/* undoing all moves since last board initialization */
+/* undoing all moves since last board initialization
+ * input: none
+ * output: none
+ * */
 void restart_game();
 
-/* fills all obvious values - as it was declared in the project guide - with their value */
+/* fills all obvious values - as it was declared in the project guide - with their value
+ * input: none
+ * output: none
+ * */
 void autofill();
 
-/* returns the number of possible solutions exist for the given board */
+/* returns the number of possible solutions exist for the given board
+ * input: none
+ * output: none
+ * */
 void num_solutions();
 
-/* if the current board is empty - generates a new game board
+/* if the current board is empty - generates a new game board and prints it
  * input:
  * x - number of cells which will be randomly chosen and filled by the method
  * y - number of game board cells that will be left filled, after a full generation of a board was completed.
- * output: prints the generated game board
+ * output: none
  * */
 void generate(int x, int y);
 
@@ -29,11 +44,11 @@ void generate(int x, int y);
  */
 int validate_solution(int print_board);
 
-/* prints a hint for the given cell
+/* prints a hint for the given cell taken out of the solution board (generated if needed)
  * input:
  * int x - the x value of the cell
  * int y - the y value of the cell
- * output: prints the possible value for the cell
+ * output: none
  */
 void get_hint(int x, int y);
 

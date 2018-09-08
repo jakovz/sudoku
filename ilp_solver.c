@@ -4,7 +4,7 @@
 #include "ilp_solver.h"
 #include "gurobi_c.h"
 
-void create_empty_model(int **game_board, double *lb, char *vtype, int rows_columns) {
+static void create_empty_model(int **game_board, double *lb, char *vtype, int rows_columns) {
     int i;
     int j;
     int v;
@@ -25,7 +25,7 @@ void create_empty_model(int **game_board, double *lb, char *vtype, int rows_colu
     }
 }
 
-int create_single_value_per_cell_constraints(GRBmodel *model, int *ind, double *val, int error, int rows_columns) {
+static int create_single_value_per_cell_constraints(GRBmodel *model, int *ind, double *val, int error, int rows_columns) {
     int i;
     int j;
     int v;
@@ -42,7 +42,7 @@ int create_single_value_per_cell_constraints(GRBmodel *model, int *ind, double *
     return error;
 }
 
-int create_appear_once_in_row_constrains(GRBmodel *model, int *ind, double *val, int error,
+static int create_appear_once_in_row_constrains(GRBmodel *model, int *ind, double *val, int error,
                                          int rows_columns) {
     int v;
     int j;
@@ -60,7 +60,7 @@ int create_appear_once_in_row_constrains(GRBmodel *model, int *ind, double *val,
     return error;
 }
 
-int create_appear_once_in_column_constrains(GRBmodel *model, int *ind, double *val, int error, int rows_columns) {
+static int create_appear_once_in_column_constrains(GRBmodel *model, int *ind, double *val, int error, int rows_columns) {
     int v;
     int i;
     int j;
@@ -77,7 +77,7 @@ int create_appear_once_in_column_constrains(GRBmodel *model, int *ind, double *v
     return error;
 }
 
-int
+static int
 create_appear_once_in_block_constrains(GRBmodel *model, int *ind, double *val, int count, int error, int rows_columns,
                                        int rows_per_block, int columns_per_block) {
     int v, i, j, ig, jg;
@@ -99,7 +99,7 @@ create_appear_once_in_block_constrains(GRBmodel *model, int *ind, double *val, i
     return error;
 }
 
-void allocate_ilp_variables(int **ind, double **val, double **lb, char **vtype, int rows_columns) {
+static void allocate_ilp_variables(int **ind, double **val, double **lb, char **vtype, int rows_columns) {
     (*ind) = (int *) malloc(rows_columns * sizeof(int));
     (*val) = (double *) malloc(rows_columns * sizeof(double));
     (*lb) = (double *) malloc(rows_columns * rows_columns * rows_columns * sizeof(double));
@@ -111,7 +111,7 @@ void allocate_ilp_variables(int **ind, double **val, double **lb, char **vtype, 
 }
 
 
-void free_ilp_variables(int **ind, double **val, double **lb, char **vtype) {
+static void free_ilp_variables(int **ind, double **val, double **lb, char **vtype) {
     free(*ind);
     free(*val);
     free(*lb);

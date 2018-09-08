@@ -3,6 +3,8 @@
 
 #endif /* SUDOKU_GAME_MOVES_LIST_H */
 
+/* all the functions which related to the game moves list (the "behind the scenes" of undo and redo commands) */
+
 struct game_move {
     struct game_move *next;
     struct game_move *prev;

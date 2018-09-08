@@ -3,6 +3,9 @@
 
 #endif /* SUDOKU_GAME_BOARD_OPERATIONS_H */
 
+/* helper functions which are related to the game board */
+
+
 int **game_board; /* the game board */
 int **fixed_numbers_board; /* a board which holds the indicators (1 or 0) for the fixed values in the game board */
 int **erroneous_board; /* a board which holds the indicators (1 or 0) for the erroneous values in the game board */

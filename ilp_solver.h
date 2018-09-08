@@ -3,6 +3,8 @@
 
 #endif /* sudoku_ILP_SOLVER_H */
 
+/* the functions who are responsible for solving the game board through Gurobi (ILP). */
+
 /* solves a given sudoku board using ILP algorithms.
  * input:
  * int **game_board - a two dimensional array representing the matrix

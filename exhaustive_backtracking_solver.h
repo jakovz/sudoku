@@ -3,6 +3,9 @@
 
 #endif /* sudoku_EXHAUSTIVE_BACKTRACKING_SOLVER_H */
 
+/* the functions who are responsible for giving the number of the solution exist for the
+ * game board through exhaustive_backtracking. */
+
 int **current_indicators_board;
 struct StackNode {
     int rows_index;
@@ -10,30 +13,6 @@ struct StackNode {
     int current;
     struct StackNode *next;
 };
-
-struct StackNode *newNode(int rows_index, int columns_index, int current);
-
-/* checks if the stack is empty
- * input:
- * struct StackNode *root - the root of the stack
- * output - 1 if the stack is empty and 0 otherwise.
- * */
-int isEmpty(struct StackNode *root);
-
-/* pushes the StackNode to the stack
- * StackNode ** root - the root of the stack
- * int rows_index - the index of the row
- * int columns_index - the index of the columns
- * int current - the current value of the cell
- * */
-void push(struct StackNode **root, int rows_index, int columns_index, int current);
-
-/* pops the root of that stack
- * input:
- * StackNode ** root - the root of the stack
- * output: StackNode containing the values of old root
- * */
-struct StackNode pop(struct StackNode **root);
 
 /* calculates the number of the solutions exist for a given board using exhaustive backtracking
  * input:

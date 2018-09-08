@@ -124,7 +124,7 @@ void set_cell(int x, int y, int z) {
     }
 }
 
-void undo_move() {
+static void undo_move() {
     game_board[(*game_moves).x_value][(*game_moves).y_value] = (*game_moves).old_z_value;
     if ((*game_moves).old_z_value != 0 && (*game_moves).new_z_value == 0) {
         EMPTY_CELLS_NUM--;
@@ -136,7 +136,7 @@ void undo_move() {
     game_moves = (*game_moves).prev;
 }
 
-void print_undo_move_message(int print_moves) {
+static void print_undo_move_message(int print_moves) {
     if ((*(*game_moves).next).old_z_value == 0) {
         if (((*(*game_moves).next).generate_autofill_command == 4) && print_moves) {
             printf("Undo %d,%d: from %d to _\n", (*(*game_moves).next).y_value + 1,
@@ -199,7 +199,7 @@ void undo(int print_moves) {
     }
 }
 
-void redo_move() {
+static void redo_move() {
     game_board[(*(*game_moves).next).x_value][(*(*game_moves).next).y_value] = (*(*game_moves).next).new_z_value;
     if ((*(*game_moves).next).old_z_value != 0 && (*(*game_moves).next).new_z_value == 0) {
         EMPTY_CELLS_NUM++;
@@ -211,7 +211,7 @@ void redo_move() {
     game_moves = (*game_moves).next;
 }
 
-void
+static void
 print_redo_message(int print_moves, int redo_x_value, int redo_y_value, int redo_old_z_value, int redo_new_z_value) {
     if (redo_new_z_value == 0) {
         if (print_moves) {
@@ -362,7 +362,7 @@ int validate_solution(int print_messages) {
     }
 }
 
-int try_generate(int x) {
+static int try_generate(int x) {
     int x_index;
     int y_index;
     int i;
@@ -596,7 +596,7 @@ void num_solutions() {
     free(exhaustive_board);
 }
 
-int get_autofill_value(int x, int y, int **filled_board) {
+static int get_autofill_value(int x, int y, int **filled_board) {
     int i;
     int *available_numbers;
     int *filled_available_numbers;

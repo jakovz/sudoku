@@ -14,8 +14,12 @@ const char *solve_commands[] = {"solve", "edit", "mark_errors", "print_board", "
                                 "save", "hint", "num_solutions", "autofill", "reset", "exit", NULL};
 const char *init_commands[] = {"solve", "edit", "exit", NULL};
 
-
-void execute_set_cell(char **params) {
+/* validates 3 parameters were given for the set command that they are of type int, and calls set_cell
+ * input:
+ * char **params - array of parameters to the function
+ * output: none
+ * */
+static void execute_set_cell(char **params) {
     int set_cell_params[3];
     int i;
     char *next;
@@ -41,7 +45,12 @@ void execute_set_cell(char **params) {
     set_cell(set_cell_params[1], set_cell_params[0], set_cell_params[2]);
 }
 
-void execute_generate(char **params) {
+/* validates 2 parameters were given for the generate command that they are of type int, and calls generate
+ * input:
+ * char **params - array of parameters to the function
+ * output: none
+ * */
+static void execute_generate(char **params) {
     int generate_params[2];
     int i;
     char *next;
@@ -65,7 +74,12 @@ void execute_generate(char **params) {
     generate(generate_params[0], generate_params[1]);
 }
 
-void execute_save_board(char **params) {
+/* validates that one parameter was given for the save command, and calls save_board
+ * input:
+ * char **params - array of parameters to the function
+ * output: none
+ * */
+static void execute_save_board(char **params) {
     if (params == NULL) {
         printf("Error: invalid command\n");
         return;
@@ -78,7 +92,12 @@ void execute_save_board(char **params) {
     }
 }
 
-void execute_get_hint(char **params) {
+/* validates 2 parameters were given for the set command that they are of type int, and calls get_hint
+ * input:
+ * char **params - array of parameters to the function
+ * output: none
+ * */
+static void execute_get_hint(char **params) {
     int get_hint_params[2];
     int i;
     char *next;
@@ -101,7 +120,12 @@ void execute_get_hint(char **params) {
     get_hint(get_hint_params[0], get_hint_params[1]);
 }
 
-void execute_mark_errors(char **params) {
+/* validates 1 parameter was given for the mark_errors command that it is of type int and it is 0 or 1, and calls mark_errors
+ * input:
+ * char **params - array of parameters to the function
+ * output: none
+ * */
+static void execute_mark_errors(char **params) {
     int mark_errors_param;
     char *next;
     if (params == NULL) {
@@ -121,7 +145,13 @@ void execute_mark_errors(char **params) {
     mark_errors(mark_errors_param);
 }
 
-int execute_command(char *command, char **params) {
+/* executes the given command by calling its executor function (or directly the function if only little validation of the parameters is needed)
+ * input:
+ * char **params - array of parameters to the function
+ * char *command - the command to be executed
+ * output: none
+ * */
+static int execute_command(char *command, char **params) {
     /* gets the command as a string and invokes it's corresponding function */
     if (strcmp(all_commands[0], command) == 0) {
         if (params == NULL || params[0] == NULL) {
@@ -167,7 +197,13 @@ int execute_command(char *command, char **params) {
     return 1;
 }
 
-void free_splitted_params(char ***splitted_params, size_t count) {
+/* frees the array of split paramters that is created by str_split in play_game.
+ * input: none
+ * char ***splitted_params - a pointer to the array of the parameters
+ * size_t count - the number of parameters in splitted_params
+ * output: none
+ * */
+static void free_splitted_params(char ***splitted_params, size_t count) {
     int i;
     if ((*splitted_params) != NULL) {
         for (i = 0; i < (int) count; i++) {
@@ -178,7 +214,13 @@ void free_splitted_params(char ***splitted_params, size_t count) {
     *splitted_params = NULL;
 }
 
-int check_if_suitable_command(const char *commands[], char *command) {
+/* checks if the given command belongs to the give group of commands
+ * input:
+ * char *commands[] - the group of commands to be checked
+ * char *command - the command to check for
+ * output - 1 if the command belongs to the given group and 0 otherwise
+ * */
+static int check_if_suitable_command(char *commands[], char *command) {
     int i;
     i = 0;
     while (commands[i] != NULL) {
@@ -190,6 +232,10 @@ int check_if_suitable_command(const char *commands[], char *command) {
     return 0;
 }
 
+/* controls the game flow - getting commands from the user and calling the corresponding functions
+ * input: none
+ * output: none
+ * */
 void play_game() {
     char *command_and_parameters;
     char *command;

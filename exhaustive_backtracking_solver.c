@@ -3,7 +3,7 @@
 #include "exhaustive_backtracking_solver.h"
 #include "game_board_operations.h"
 
-struct StackNode *newNode(int rows_index, int columns_index, int current) {
+static struct StackNode *newNode(int rows_index, int columns_index, int current) {
     struct StackNode *stackNode = (struct StackNode *) malloc(sizeof(struct StackNode));
     if (stackNode==NULL){
         printf("Error: num_solutions failed\n");
@@ -16,17 +16,17 @@ struct StackNode *newNode(int rows_index, int columns_index, int current) {
     return stackNode;
 }
 
-int isEmpty(struct StackNode *root) {
+static int isEmpty(struct StackNode *root) {
     return !root;
 }
 
-void push(struct StackNode **root, int rows_index, int columns_index, int current) {
+static void push(struct StackNode **root, int rows_index, int columns_index, int current) {
     struct StackNode *stackNode = newNode(rows_index, columns_index, current);
     (*stackNode).next = *root;
     *root = stackNode;
 }
 
-struct StackNode pop(struct StackNode **root) {
+static struct StackNode pop(struct StackNode **root) {
     struct StackNode tmp;
     struct StackNode *second_tmp;
     second_tmp = *root;

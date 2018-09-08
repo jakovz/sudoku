@@ -220,7 +220,7 @@ static void free_splitted_params(char ***splitted_params, size_t count) {
  * char *command - the command to check for
  * output - 1 if the command belongs to the given group and 0 otherwise
  * */
-static int check_if_suitable_command(char *commands[], char *command) {
+static int check_if_suitable_command(const char *commands[], char *command) {
     int i;
     i = 0;
     while (commands[i] != NULL) {

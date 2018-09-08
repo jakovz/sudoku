@@ -13,6 +13,11 @@ struct StackNode {
 
 struct StackNode *newNode(int rows_index, int columns_index, int current);
 
+/* checks if the stack is empty
+ * input:
+ * struct StackNode *root - the root of the stack
+ * output - 1 if the stack is empty and 0 otherwise.
+ * */
 int isEmpty(struct StackNode *root);
 
 /* pushes the StackNode to the stack

@@ -3,14 +3,14 @@
 
 #endif /* SUDOKU_GAME_BOARD_OPERATIONS_H */
 
-int **game_board;
-int **fixed_numbers_board;
-int **erroneous_board;
-int **solved_board;
-int ROWS_PER_BLOCK;
-int COLUMNS_PER_BLOCK;
-int ROWS_COLUMNS_NUM;
-int EMPTY_CELLS_NUM;
+int **game_board; /* the game board */
+int **fixed_numbers_board; /* a board which holds the indicators (1 or 0) for the fixed values in the game board */
+int **erroneous_board; /* a board which holds the indicators (1 or 0) for the erroneous values in the game board */
+int **solved_board; /* a board which holds the solution of the game board */
+int ROWS_PER_BLOCK; /* the number of rows a block in the game board has */
+int COLUMNS_PER_BLOCK; /* the number of columns a block in the game board has */
+int ROWS_COLUMNS_NUM; /* the number of rows(=columns) the game board has */
+int EMPTY_CELLS_NUM; /* the number of empty cell the game board has in every moment of the game */
 int GAME_MODE; /* 0 - init mode, 1 - edit mode, 2 - solve mode */
 int MARK_ERRORS; /* 0 - do not mark errors, 1 - mark errors */
 int GAME_ALREADY_INITIALIZED; /* 0 - not initialized yet, 1 - already initialized */
@@ -128,7 +128,24 @@ void print_board();
  * */
 int count_empty_cells();
 
+/* check if there are erroneous cells  which are no longer erroneous after committing a move and updates the board
+ * and the moves list
+ * input:
+ * int old - the old value of the cell
+ * int x  - the x value of the cell
+ * int y - the y value of the cell
+ * output: none
+ * */
 void cancel_erroneous_values(int old, int x, int y);
 
+/* gets an array of size ROWS_COLUMNS_NUM number and returns the number of occurrences of the number in the row/column/block
+ * for each (index-1) in the array. unlike get_available_number_for_set, it does not take care of the game_moves list
+ * and gets the game board it should check as an argument.
+ * input:
+ * int *available_numbers - list of size ROWS_COLUMNS_NUM
+ * int rows_index - the index of the cell to check for
+ * int columns_index - the index of the columns ot check for
+ * int **tmp_game_board - the board we should check for available numbers at
+ */
 void
 get_available_numbers_for_backtrack(int **tmp_game_board, int *available_numbers, int rows_index, int columns_index);

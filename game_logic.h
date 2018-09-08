@@ -14,7 +14,6 @@ void autofill();
 /* returns the number of possible solutions exist for the given board */
 void num_solutions();
 
-
 /* if the current board is empty - generates a new game board
  * input:
  * x - number of cells which will be randomly chosen and filled by the method

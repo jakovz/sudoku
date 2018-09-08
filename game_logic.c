@@ -473,8 +473,8 @@ void generate(int x, int y) {
             second_tmp_board[i][j] = 0;
         }
     }
-    if (EMPTY_CELLS_NUM < ROWS_COLUMNS_NUM * ROWS_COLUMNS_NUM) {
-        printf("Error: board is not empty\n");
+    if (x > EMPTY_CELLS_NUM || y > EMPTY_CELLS_NUM) {
+        printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
         for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
             free(tmp_board[i]);
             free(second_tmp_board[i]);
@@ -483,8 +483,8 @@ void generate(int x, int y) {
         free(tmp_board);
         return;
     }
-    if (x > EMPTY_CELLS_NUM || y > EMPTY_CELLS_NUM) {
-        printf("Error: value not in range 0-%d\n", EMPTY_CELLS_NUM);
+    if (EMPTY_CELLS_NUM < ROWS_COLUMNS_NUM * ROWS_COLUMNS_NUM) {
+        printf("Error: board is not empty\n");
         for (i = 0; i < ROWS_COLUMNS_NUM; i++) {
             free(tmp_board[i]);
             free(second_tmp_board[i]);
